@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faster Admin - Secure Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 h-screen flex items-center justify-center p-6">
+
+    <div class="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl">
+        <div class="text-center mb-8">
+            <div class="w-20 h-20 bg-orange-500 rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-4">
+                <i class="fas fa-user-shield text-white text-4xl"></i>
+            </div>
+            <h1 class="text-2xl font-black text-slate-800 italic uppercase">Admin Access</h1>
+            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Authorized Personnel Only</p>
+        </div>
+
+        <div class="space-y-4">
+            <div class="relative">
+                <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="password" id="adminPin" placeholder="Enter Admin Security PIN" 
+                       class="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 ring-orange-500 font-bold text-center tracking-[0.5em]">
+            </div>
+            
+            <button onclick="checkAdminAccess()" id="loginBtn" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all">
+                SECURE LOGIN
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_SECRET_PIN = "123456"; // Ise badal kar apna secret PIN rakhein
+
+        function checkAdminAccess() {
+            const pin = document.getElementById('adminPin').value;
+            const btn = document.getElementById('loginBtn');
+
+            if(pin === ADMIN_SECRET_PIN) {
+                // Browser mein admin hone ka "Pass" save kar dena
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                localStorage.setItem('adminSessionStart', Date.now());
+                
+                btn.innerText = "ACCESS GRANTED...";
+                btn.className = "w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-xl";
+                
+                setTimeout(() => {
+                    location.href = 'dashboard.html';
+                }, 1000);
+            } else {
+                alert("Incorrect Security PIN! ❌");
+                document.getElementById('adminPin').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
