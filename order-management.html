@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Order Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800;900&display=swap');
+        
+        :root {
+            --bg-color: #1a1c23;      
+            --neo-dark: #121318;      
+            --neo-light: #22252e;     
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-color); 
+            color: #9ca3af; 
+        }
+
+        /* NEOMORPHISM */
+        .neo-inset {
+            background: var(--bg-color);
+            box-shadow: inset 4px 4px 8px var(--neo-dark), inset -4px -4px 8px var(--neo-light);
+        }
+
+        .neo-outset {
+            background: var(--bg-color);
+            box-shadow: 6px 6px 12px var(--neo-dark), -6px -6px 12px var(--neo-light);
+            transition: all 0.3s ease;
+        }
+        
+        .neo-outset:hover {
+            box-shadow: 8px 8px 16px var(--neo-dark), -8px -8px 16px var(--neo-light);
+            transform: translateY(-2px);
+        }
+
+        .text-glow-green { color: white; text-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
+        .text-glow-orange { color: white; text-shadow: 0 0 15px rgba(249, 115, 22, 0.5); }
+        .text-glow-blue { color: white; text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .text-glow-red { color: white; text-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="h-20 px-8 flex justify-between items-center border-b border-gray-800/50 bg-[#1a1c23]/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <button onclick="location.href='dashboard.html'" class="w-10 h-10 neo-outset rounded-full flex items-center justify-center text-gray-400 hover:text-green-500 active:neo-inset transition-all">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="text-white font-black text-lg tracking-widest uppercase text-glow-green">Order Management</h2>
+        </div>
+        <div class="flex items-center gap-3 neo-inset px-4 py-2 rounded-full border border-gray-800">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse" style="box-shadow: 0 0 10px #22c55e;"></div>
+            <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest" id="syncStatus">Live Sync On</span>
+        </div>
+    </header>
+
+    <main class="flex-1 p-8 overflow-y-auto max-w-7xl mx-auto w-full">
+        
+        <div class="mb-8">
+            <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">Live Order Statistics</h3>
+            <p class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Real-time updates from database</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+            
+            <div onclick="location.href='all-orders.html'" class="neo-outset rounded-[2rem] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden group cursor-pointer">
+                <div class="absolute top-0 w-full h-1 bg-blue-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <div class="w-14 h-14 rounded-full neo-inset flex items-center justify-center mb-4 text-blue-500">
+                    <i class="fas fa-layer-group text-xl drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"></i>
+                </div>
+                <h3 class="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-2">Total All Orders</h3>
+                <h2 id="countAll" class="text-4xl font-black text-white text-glow-blue transition-all">0</h2>
+            </div>
+
+            <div onclick="location.href='active-orders.html'" class="neo-outset rounded-[2rem] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden group cursor-pointer">
+                <div class="absolute top-0 w-full h-1 bg-orange-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <div class="w-14 h-14 rounded-full neo-inset flex items-center justify-center mb-4 text-orange-500">
+                    <i class="fas fa-motorcycle text-xl drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]"></i>
+                </div>
+                <h3 class="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-2">Active Orders</h3>
+                <h2 id="countActive" class="text-4xl font-black text-white text-glow-orange transition-all">0</h2>
+                <span class="text-[8px] bg-gray-800 text-gray-500 px-2 py-0.5 rounded-md font-bold uppercase mt-2 border border-gray-700">Assigned / Processing</span>
+            </div>
+
+            <div onclick="location.href='completed-orders.html'" class="neo-outset rounded-[2rem] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden group cursor-pointer">
+                <div class="absolute top-0 w-full h-1 bg-green-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <div class="w-14 h-14 rounded-full neo-inset flex items-center justify-center mb-4 text-green-500">
+                    <i class="fas fa-check-double text-xl drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"></i>
+                </div>
+                <h3 class="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-2">Completed Orders</h3>
+                <h2 id="countCompleted" class="text-4xl font-black text-white text-glow-green transition-all">0</h2>
+            </div>
+
+            <div onclick="location.href='canceled-orders.html'" class="neo-outset rounded-[2rem] p-6 flex flex-col items-center justify-center text-center relative overflow-hidden group cursor-pointer">
+                <div class="absolute top-0 w-full h-1 bg-red-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <div class="w-14 h-14 rounded-full neo-inset flex items-center justify-center mb-4 text-red-500">
+                    <i class="fas fa-ban text-xl drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"></i>
+                </div>
+                <h3 class="text-gray-400 font-black text-[10px] uppercase tracking-widest mb-2">Canceled Orders</h3>
+                <h2 id="countCanceled" class="text-4xl font-black text-white text-glow-red transition-all">0</h2>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Supabase Configuration
+        const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        // UI Animation Function
+        function animateValue(id, newValue) {
+            const el = document.getElementById(id);
+            if(el.innerText !== newValue.toString()) {
+                el.style.transform = 'scale(1.2)';
+                el.innerText = newValue;
+                setTimeout(() => { el.style.transform = 'scale(1)'; }, 200);
+            }
+        }
+
+        // Fetch Order Stats
+        async function fetchOrderStats() {
+            try {
+                // Charo queries ek sath bheji ja rahi hain (Speed ke liye)
+                const [allRes, activeRes, compRes, cancRes] = await Promise.all([
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }), // All
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['assigned', 'processing', 'pending']), // Active
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'completed'), // Completed
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['canceled', 'cancelled', 'CANCELLED']) // Canceled
+                ]);
+
+                // UI Update
+                animateValue('countAll', allRes.count || 0);
+                animateValue('countActive', activeRes.count || 0);
+                animateValue('countCompleted', compRes.count || 0);
+                animateValue('countCanceled', cancRes.count || 0);
+
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+                document.getElementById('syncStatus').innerText = "Sync Error";
+                document.getElementById('syncStatus').classList.replace('text-gray-300', 'text-red-500');
+            }
+        }
+
+        // Realtime Listener Setup
+        function setupLiveSync() {
+            _supabase.channel('order-stats-tracker')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
+                    console.log("Database Changed, Updating Stats...");
+                    fetchOrderStats();
+                }).subscribe();
+        }
+
+        // Initialize Call
+        window.onload = () => {
+            fetchOrderStats();
+            setupLiveSync(); // Realtime on kar diya gaya hai
+        };
+    </script>
+</body>
+</html>

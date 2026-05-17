@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Today's Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800;900&display=swap');
+        
+        :root {
+            --bg-color: #1a1c23;      
+            --neo-dark: #121318;      
+            --neo-light: #22252e;     
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-color); 
+            color: #9ca3af; 
+        }
+
+        .neo-inset {
+            background: var(--bg-color);
+            box-shadow: inset 4px 4px 8px var(--neo-dark), inset -4px -4px 8px var(--neo-light);
+        }
+
+        .neo-outset {
+            background: var(--bg-color);
+            box-shadow: 6px 6px 12px var(--neo-dark), -6px -6px 12px var(--neo-light);
+        }
+
+        .text-glow { color: white; text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="h-20 px-8 flex justify-between items-center border-b border-gray-800/50 bg-[#1a1c23]/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <button onclick="location.href='order-management.html'" class="w-10 h-10 neo-outset rounded-full flex items-center justify-center text-gray-400 hover:text-blue-500 active:neo-inset transition-all">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="text-white font-black text-lg tracking-widest uppercase text-glow">Today's All Orders</h2>
+        </div>
+        <div class="bg-gray-800 px-4 py-2 rounded-2xl border border-white/5 flex items-center gap-2 shadow-inner">
+            <i class="fas fa-calendar-day text-blue-500"></i>
+            <span id="orderCount" class="text-white font-black text-sm">0</span>
+        </div>
+    </header>
+
+    <main class="flex-1 p-8 overflow-y-auto max-w-5xl mx-auto w-full">
+        
+        <div id="ordersList" class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
+            <div class="col-span-full py-20 text-center opacity-40">
+                <i class="fas fa-circle-notch fa-spin text-4xl mb-4 text-blue-500"></i>
+                <p class="text-[10px] font-black uppercase tracking-[0.3em]">Loading Today's Orders...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        async function loadTodaysOrders() {
+            try {
+                // Aaj raat 12 baje ka waqt (Start of Day) nikalne ka logic
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); 
+                const startOfDay = today.toISOString();
+
+                // Database se aaj ke orders laao (Naye pehle)
+                const { data: orders, error } = await _supabase
+                    .from('orders')
+                    .select('*')
+                    .gte('created_at', startOfDay)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                // Order Count Update
+                document.getElementById('orderCount').innerText = orders.length;
+
+                const listContainer = document.getElementById('ordersList');
+
+                if (orders.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="col-span-full py-20 text-center opacity-30">
+                            <i class="fas fa-box-open text-5xl mb-4 text-gray-500"></i>
+                            <p class="text-xs font-black uppercase tracking-widest">No orders received today yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render Orders
+                listContainer.innerHTML = orders.map(o => {
+                    // Status ke hisaab se colors aur icons set karein
+                    const status = (o.status || 'pending').toLowerCase();
+                    let statusColor = "text-gray-400 bg-gray-500/10 border-gray-500/20";
+                    let icon = "fa-clock";
+
+                    if (status === 'completed') {
+                        statusColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+                        icon = "fa-check-double";
+                    } else if (status === 'canceled' || status === 'cancelled') {
+                        statusColor = "text-red-400 bg-red-500/10 border-red-500/20";
+                        icon = "fa-ban";
+                    } else if (status === 'assigned' || status === 'processing') {
+                        statusColor = "text-orange-400 bg-orange-500/10 border-orange-500/20";
+                        icon = "fa-motorcycle";
+                    }
+
+                    return `
+                        <div class="neo-outset rounded-[2rem] p-6 flex flex-col relative overflow-hidden transition-all hover:scale-[1.01]">
+                            
+                            <div class="flex justify-between items-start mb-4 border-b border-gray-800 pb-3">
+                                <div>
+                                    <p class="text-[9px] text-gray-500 font-black uppercase tracking-widest">Order ID</p>
+                                    <h3 class="text-white font-black text-sm tracking-widest">#${o.id.toString().slice(-6).toUpperCase()}</h3>
+                                </div>
+                                <div class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border flex items-center gap-1 ${statusColor}">
+                                    <i class="fas ${icon}"></i> ${status}
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 mb-4 flex-1">
+                                <div class="flex items-center gap-3 text-gray-300">
+                                    <div class="w-8 h-8 rounded-full neo-inset flex items-center justify-center text-blue-500 shrink-0">
+                                        <i class="fas fa-user text-xs"></i>
+                                    </div>
+                                    <p class="text-xs font-bold uppercase tracking-wide truncate">${o.customer_name || 'N/A'}</p>
+                                </div>
+
+                                <div class="flex items-center gap-3 text-gray-300">
+                                    <div class="w-8 h-8 rounded-full neo-inset flex items-center justify-center text-orange-500 shrink-0">
+                                        <i class="fas fa-phone-alt text-xs"></i>
+                                    </div>
+                                    <p class="text-xs font-bold tracking-widest">${o.customer_phone || 'N/A'}</p>
+                                </div>
+
+                                <div class="flex items-start gap-3 text-gray-400">
+                                    <div class="w-8 h-8 rounded-full neo-inset flex items-center justify-center text-emerald-500 shrink-0 mt-1">
+                                        <i class="fas fa-map-marker-alt text-xs"></i>
+                                    </div>
+                                    <p class="text-[10px] font-semibold leading-relaxed mt-1.5 line-clamp-2">${o.delivery_address || 'Address not provided'}</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-3 border-t border-gray-800 flex justify-between items-center">
+                                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest">
+                                    <i class="fas fa-calendar-alt mr-1"></i> ${new Date(o.created_at).toLocaleDateString()}
+                                </p>
+                                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest">
+                                    <i class="fas fa-clock mr-1 text-blue-500"></i> ${new Date(o.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('ordersList').innerHTML = `<div class="col-span-full py-20 text-center text-red-500 font-bold uppercase tracking-widest text-[10px]">Error Loading Orders</div>`;
+            }
+        }
+
+        // Realtime Tracker (Naya order aane par khud update ho jayega)
+        function setupLiveSync() {
+            _supabase.channel('today-orders-tracker')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+                    loadTodaysOrders();
+                }).subscribe();
+        }
+
+        window.onload = () => {
+            loadTodaysOrders();
+            setupLiveSync();
+        };
+    </script>
+</body>
+</html>

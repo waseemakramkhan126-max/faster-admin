@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faster Admin - Active Terminal Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f8fafc; 
+            color: #334155;
+        }
+
+        .premium-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .premium-card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08); border-color: #cbd5e1; }
+
+        .card-overtime { background-color: #fef2f2 !important; border-color: #fca5a5 !important; }
+
+        .order-details { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s ease; opacity: 0; }
+        .order-details.open { max-height: 2500px; opacity: 1; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px dashed #e2e8f0; }
+
+        .media-bubble { background: #f1f5f9; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .media-caption { padding: 10px 14px; color: #1e293b; font-size: 13px; font-weight: 600; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+
+        audio { height: 40px; width: 100%; outline: none; }
+        .toast-enter { transform: translate(-50%, 0); opacity: 1; }
+        .toast-leave { transform: translate(-50%, -150%); opacity: 0; }
+        
+        .item-wrapper { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Hide arrows in number input */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <div id="selectionActionBar" class="fixed top-0 left-0 w-full h-16 bg-blue-600 text-white z-[100000] flex justify-between items-center px-6 transition-transform duration-300 -translate-y-full shadow-2xl">
+        <div class="flex items-center gap-4">
+            <button onclick="clearSelection()" class="w-10 h-10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-times text-xl"></i></button>
+            <span class="font-extrabold text-sm tracking-widest uppercase hidden md:block">Item Selected</span>
+        </div>
+        <button onclick="downloadAndCopy()" class="bg-white text-blue-600 px-5 py-2.5 rounded-xl text-xs font-black shadow-lg active:scale-95 transition-all flex items-center gap-2">
+            <i class="fas fa-download"></i> Save File
+        </button>
+    </div>
+
+    <div id="toast" class="toast-leave fixed top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl bg-slate-900 text-white shadow-xl transition-all duration-500 z-[99999] flex items-center gap-3 font-bold text-xs uppercase tracking-widest">
+        <i id="toastIcon" class="fas fa-check-circle text-emerald-400"></i>
+        <span id="toastMsg">Action Complete</span>
+    </div>
+
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 shadow-sm">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button onclick="location.href='order-management.html'" class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors text-slate-600">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div>
+                    <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">Active Operations Control</h1>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Realtime Fleet Management</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                <span id="orderCount" class="text-blue-600 font-black text-sm">0</span>
+                <span class="text-[10px] text-blue-500 font-bold uppercase tracking-widest hidden sm:inline">Active Missions</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
+        <div id="ordersList" class="flex flex-col gap-4 pb-12">
+            <div class="py-24 text-center text-slate-400">
+                <i class="fas fa-circle-notch fa-spin text-3xl mb-3 text-blue-600"></i>
+                <p class="text-[10px] font-bold uppercase tracking-[0.3em]">Connecting Live Stream...</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="forwardModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[85vh]">
+            <div class="p-6 bg-slate-900 text-white flex justify-between items-center shrink-0">
+                <div>
+                    <h3 class="font-extrabold text-base uppercase tracking-wider">Smart Dispatch Terminal</h3>
+                    <p class="text-[10px] text-slate-400 font-bold mt-0.5">Select an active online operator</p>
+                </div>
+                <button onclick="closeForwardModal()" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 text-white transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4 border-b border-slate-100 bg-slate-50 shrink-0">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="riderSearchInput" oninput="filterRidersList()" placeholder="Search rider by name, ID or phone..." class="w-full bg-white border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 shadow-sm">
+                </div>
+            </div>
+            <div id="ridersContainer" class="flex-1 overflow-y-auto p-4 space-y-2 bg-slate-50/50"></div>
+        </div>
+    </div>
+
+    <div id="imgModal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-[99999] flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
+        <img id="fullImg" src="" class="max-w-full max-h-[85vh] rounded-2xl shadow-2xl border-4 border-white object-contain">
+    </div>
+
+    <script>
+        const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        let globalActiveOrders = [];
+        let globalOnlineRiders = [];
+        let targetForwardOrderId = null;
+        let globalDeliveryTimerMinutes = 30; 
+        
+        let selectedItemToShare = null;
+
+        function showToast(msg, type='success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.className = `fixed top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl shadow-xl transition-all duration-500 z-[99999] flex items-center gap-3 font-bold text-xs uppercase tracking-widest toast-enter ${type === 'error' ? 'bg-red-600 text-white' : 'bg-slate-900 text-white'}`;
+            icon.className = type !== 'error' ? "fas fa-check-circle text-emerald-400" : "fas fa-exclamation-triangle text-white";
+            setTimeout(() => toast.classList.replace('toast-enter', 'toast-leave'), 3000);
+        }
+
+        window.toggleDetails = function(id) {
+            document.getElementById(`details-${id}`).classList.toggle('open');
+            document.getElementById(`icon-${id}`).classList.toggle('rotate-180');
+        }
+
+        function showImg(url) {
+            document.getElementById('fullImg').src = url;
+            document.getElementById('imgModal').classList.remove('hidden');
+        }
+
+        function triggerItemSelect(e, element) {
+            if(e) { e.preventDefault(); e.stopPropagation(); }
+            
+            const type = element.getAttribute('data-type');
+            const content = decodeURIComponent(element.getAttribute('data-content'));
+            const captionAttr = element.getAttribute('data-caption');
+            const caption = captionAttr ? decodeURIComponent(captionAttr) : ''; 
+
+            document.querySelectorAll('.item-wrapper').forEach(el => el.classList.remove('ring-4', 'ring-blue-400', 'scale-[0.98]', 'shadow-xl', 'bg-blue-50/50'));
+            
+            element.classList.add('ring-4', 'ring-blue-400', 'scale-[0.98]', 'shadow-xl');
+            if(type === 'text') element.classList.add('bg-blue-50/50');
+
+            selectedItemToShare = { type, content, caption };
+            document.getElementById('selectionActionBar').classList.remove('-translate-y-full');
+        }
+
+        function clearSelection() {
+            selectedItemToShare = null;
+            document.querySelectorAll('.item-wrapper').forEach(el => el.classList.remove('ring-4', 'ring-blue-400', 'scale-[0.98]', 'shadow-xl', 'bg-blue-50/50'));
+            document.getElementById('selectionActionBar').classList.add('-translate-y-full');
+        }
+
+        async function downloadAndCopy() {
+            if(!selectedItemToShare) return;
+            try {
+                if(selectedItemToShare.type === 'text') {
+                    navigator.clipboard.writeText(selectedItemToShare.content);
+                    showToast("Text Copied to Clipboard!");
+                } else {
+                    showToast("Downloading file... Please wait.", "success");
+                    const fileUrl = selectedItemToShare.content;
+                    const response = await fetch(fileUrl);
+                    const blob = await response.blob();
+                    const blobUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = blobUrl;
+                    
+                    let ext = fileUrl.split('?')[0].split('.').pop();
+                    if(ext.length > 4 || !ext) ext = 'jpg'; 
+                    if(blob.type.includes('audio') || blob.type.includes('webm')) ext = 'ogg';
+
+                    a.download = `Faster_Media_${new Date().getTime()}.${ext}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    window.URL.revokeObjectURL(blobUrl);
+                    document.body.removeChild(a);
+
+                    if (selectedItemToShare.caption && selectedItemToShare.caption.trim() !== '') {
+                        navigator.clipboard.writeText(selectedItemToShare.caption);
+                        setTimeout(() => showToast("Saved! Caption copied to paste anywhere."), 1500);
+                    } else {
+                        setTimeout(() => showToast("File Downloaded Successfully!"), 1500);
+                    }
+                }
+            } catch(e) {
+                console.error("Force Download Error:", e);
+                showToast("Failed to download file.", "error");
+            }
+            clearSelection();
+        }
+
+        async function fetchDeliveryTimer() {
+            try {
+                const { data } = await _supabase.from('app_settings').select('delivery_timer').eq('id', 1).single();
+                if (data && data.delivery_timer) globalDeliveryTimerMinutes = parseInt(data.delivery_timer);
+            } catch (err) {}
+        }
+
+        function renderOrderMedia(o) {
+            let html = "";
+            const parseMedia = (val) => (val && typeof val === 'string') ? val.split(',').map(s => s.trim()) : [];
+            const allTextLines = String(o.order_details || o.text_content || '').split(/[|\n]/).map(line => line.trim()).filter(l => l !== "");
+            const images = parseMedia(o.image_url);
+            const videos = parseMedia(o.video_url);
+            const voices = parseMedia(o.voice_url);
+            const documents = parseMedia(o.doc_url || o.document_url || o.file_url);
+            const mainOrderLines = allTextLines.filter(l => !l.toLowerCase().includes("photo caption:"));
+            const photoCaptions = allTextLines.filter(l => l.toLowerCase().includes("photo caption:"));
+
+            mainOrderLines.forEach(item => {
+                let safeContent = encodeURIComponent(item);
+                html += `
+                <div class="relative group item-wrapper rounded-xl mb-2.5" data-type="text" data-content="${safeContent}" data-caption="" oncontextmenu="triggerItemSelect(event, this); return false;">
+                    <div class="bg-slate-50 text-slate-700 p-3 rounded-xl text-xs font-bold border border-slate-200 shadow-sm flex items-start gap-2">
+                        <i class="fas fa-comment-alt text-blue-500 shrink-0 mt-0.5 opacity-60"></i><span class="whitespace-pre-wrap">${item}</span>
+                    </div>
+                    <div class="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 hidden md:flex bg-white shadow-lg border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] text-blue-600 font-black cursor-pointer hover:bg-blue-50 z-10" onclick="event.stopPropagation(); triggerItemSelect(event, this.parentElement)">
+                        <i class="fas fa-copy mr-1"></i> Copy
+                    </div>
+                </div>`;
+            });
+            
+            images.forEach((img, index) => {
+                if(!img) return;
+                let cap = photoCaptions[index] ? photoCaptions[index].replace(/photo caption:/i, '').trim() : "";
+                let safeUrl = encodeURIComponent(img);
+                let safeCap = encodeURIComponent(cap);
+                html += `
+                <div class="relative group item-wrapper rounded-2xl mb-3" data-type="media" data-content="${safeUrl}" data-caption="${safeCap}" oncontextmenu="triggerItemSelect(event, this); return false;">
+                    <div class="media-bubble m-0 shadow-sm">
+                        <img src="${img}" class="w-full h-auto object-cover max-h-[280px] cursor-pointer" onclick="event.stopPropagation(); showImg('${img}')">
+                        ${cap ? `<div class="media-caption"><i class="fas fa-heading mr-1.5 text-slate-400"></i>${cap}</div>` : ''}
+                    </div>
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hidden md:flex bg-white shadow-lg border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] text-blue-600 font-black cursor-pointer hover:bg-blue-50 z-10" onclick="event.stopPropagation(); triggerItemSelect(event, this.parentElement)">
+                        <i class="fas fa-download mr-1"></i> Save
+                    </div>
+                </div>`;
+            });
+
+            videos.forEach(vid => { 
+                if(vid) {
+                    let safeUrl = encodeURIComponent(vid);
+                    html += `
+                    <div class="relative group item-wrapper rounded-2xl mb-3" data-type="media" data-content="${safeUrl}" data-caption="" oncontextmenu="triggerItemSelect(event, this); return false;">
+                        <div class="media-bubble m-0"><video controls playsinline class="w-full bg-black max-h-[280px]" onclick="event.stopPropagation();"><source src="${vid}"></video></div>
+                        <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hidden md:flex bg-white shadow-lg border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] text-blue-600 font-black cursor-pointer hover:bg-blue-50 z-10" onclick="event.stopPropagation(); triggerItemSelect(event, this.parentElement)">
+                            <i class="fas fa-download mr-1"></i> Save
+                        </div>
+                    </div>`;
+                }
+            });
+
+            voices.forEach(voice => { 
+                if(voice) {
+                    let safeUrl = encodeURIComponent(voice);
+                    html += `
+                    <div class="relative group item-wrapper rounded-2xl mb-3" data-type="media" data-content="${safeUrl}" data-caption="" oncontextmenu="triggerItemSelect(event, this); return false;">
+                        <div class="media-bubble m-0 p-3 bg-emerald-50 border border-emerald-200 flex items-center gap-3" onclick="event.stopPropagation();">
+                            <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm"><i class="fas fa-microphone text-sm"></i></div>
+                            <audio controls class="flex-1"><source src="${voice}"></audio>
+                        </div>
+                        <div class="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 hidden md:flex bg-white shadow-lg border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] text-blue-600 font-black cursor-pointer hover:bg-blue-50 z-10" onclick="event.stopPropagation(); triggerItemSelect(event, this.parentElement)">
+                            <i class="fas fa-download mr-1"></i> Save
+                        </div>
+                    </div>`;
+                }
+            });
+
+            documents.forEach(docUrl => {
+                if(docUrl) {
+                    let isPdf = docUrl.includes(".pdf"); let isApk = docUrl.includes(".apk");
+                    let icon = isPdf ? "fa-file-pdf text-red-500" : (isApk ? "fa-android text-emerald-500" : "fa-file-alt text-blue-500");
+                    let fname = docUrl.split('/').pop().substring(0, 22) + '...';
+                    let safeUrl = encodeURIComponent(docUrl);
+                    html += `
+                    <div class="relative group item-wrapper rounded-2xl mb-3" data-type="media" data-content="${safeUrl}" data-caption="" oncontextmenu="triggerItemSelect(event, this); return false;">
+                        <a href="${docUrl}" target="_blank" onclick="event.stopPropagation();" class="media-bubble m-0 p-3 flex items-center justify-between hover:bg-slate-100 transition-colors cursor-pointer bg-slate-50 border border-slate-200">
+                            <div class="flex items-center gap-3"><i class="fas ${icon} text-2xl shrink-0"></i><div><p class="text-xs font-bold text-slate-800 truncate">${fname}</p><p class="text-[9px] text-blue-500 font-bold uppercase mt-0.5">Download</p></div></div>
+                            <i class="fas fa-arrow-alt-circle-down text-xl text-slate-400"></i>
+                        </a>
+                        <div class="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 hidden md:flex bg-white shadow-lg border border-slate-200 rounded-lg px-3 py-1.5 text-[10px] text-blue-600 font-black cursor-pointer hover:bg-blue-50 z-10" onclick="event.stopPropagation(); triggerItemSelect(event, this.parentElement)">
+                            <i class="fas fa-download mr-1"></i> Save
+                        </div>
+                    </div>`;
+                }
+            });
+
+            if (html === "") return `<div class="text-center py-4 text-xs font-bold italic text-slate-400 uppercase tracking-wider bg-slate-50 border rounded-2xl border-slate-200">No assets provided.</div>`;
+            return html;
+        }
+
+        async function loadActiveOrders() {
+            try {
+                const { data: orders, error: ordErr } = await _supabase.from('orders').select('*').in('status', ['assigned', 'purchasing', 'processing', 'arrived']).order('updated_at', { ascending: false });
+                if (ordErr) throw ordErr;
+                globalActiveOrders = orders || [];
+                document.getElementById('orderCount').innerText = globalActiveOrders.length;
+
+                const { data: riders } = await _supabase.from('riders').select('rider_id, name, phone');
+                const ridersMap = {};
+                if(riders) riders.forEach(r => { if(r.phone) ridersMap[r.phone.trim()] = r; });
+
+                if (globalActiveOrders.length === 0) {
+                    document.getElementById('ordersList').innerHTML = `<div class="py-24 text-center premium-card rounded-[2rem]"><i class="fas fa-check-double text-slate-300 text-4xl mb-3"></i><p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Terminal Clear. No Active Orders.</p></div>`;
+                    return;
+                }
+
+                document.getElementById('ordersList').innerHTML = globalActiveOrders.map(o => {
+                    const rStatus = (o.rider_status || o.status || 'Pending').toUpperCase();
+                    const phoneKey = String(o.rider_phone || '').trim();
+                    const safeStatus = (o.status || '').toLowerCase();
+                    const safeRiderStatus = (o.rider_status || '').toLowerCase();
+                    
+                    let riderProfileHtml = `<span class="text-slate-400 font-bold">Unassigned</span>`;
+                    if (phoneKey && ridersMap[phoneKey]) {
+                        const rInfo = ridersMap[phoneKey];
+                        riderProfileHtml = `<span class="text-slate-700 font-extrabold">${rInfo.name}</span> <span class="text-slate-300 mx-1">|</span> <span class="text-blue-600 font-bold">${rInfo.rider_id}</span> <span class="text-slate-300 mx-1">|</span> <span class="text-slate-500 font-medium text-[10px]">${rInfo.phone}</span>`;
+                    } else if (o.rider_phone) { riderProfileHtml = `<span class="text-slate-600 font-extrabold">${o.rider_phone}</span>`; }
+                    
+                    let badgeColor = "bg-blue-50 text-blue-600 border border-blue-200";
+                    if(safeStatus === 'arrived' || safeRiderStatus === 'arrived') badgeColor = "bg-purple-50 text-purple-600 border border-purple-200 animate-pulse";
+                    if(safeStatus === 'processing' || safeStatus === 'purchasing') badgeColor = "bg-orange-50 text-orange-600 border border-orange-200";
+
+                    return `
+                        <div id="order-card-${o.id}" class="premium-card rounded-[2rem] p-4 lg:p-5 transition-colors duration-300">
+                            <div class="flex flex-wrap lg:flex-nowrap justify-between items-center gap-4 cursor-pointer" onclick="toggleDetails('${o.id}')">
+                                <div class="flex items-center gap-4 w-full sm:w-auto min-w-[160px]">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-blue-600 border border-slate-200 shrink-0">
+                                        <i class="fas fa-truck-loading text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-slate-800 font-extrabold text-xs md:text-sm tracking-widest uppercase">#${o.id.toString().slice(-6).toUpperCase()}</h3>
+                                        <div class="flex items-center gap-1 mt-0.5 text-[10px] text-blue-600 font-extrabold tracking-widest id-timer-wrapper">
+                                            <i class="fas fa-stopwatch timer-icon"></i> 
+                                            <span class="live-timer" id="timer-el-${o.id}" data-status="${safeStatus}" data-rider-status="${safeRiderStatus}" data-start="${o.assigned_at || o.created_at}" data-stop="${o.updated_at}" data-rider-phone="${o.rider_phone || ''}" data-alert-sent="false">--:--</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="hidden md:block flex-1 px-4 border-l border-slate-200 max-w-sm">
+                                    <h4 class="text-xs font-black text-slate-800 uppercase truncate">${o.customer_name || 'Client'}</h4>
+                                    <p class="text-[10px] text-slate-400 font-bold tracking-widest truncate mt-0.5"><i class="fas fa-phone-alt mr-1 text-slate-300"></i>${o.customer_phone}</p>
+                                </div>
+                                <div class="hidden lg:block flex-1 px-4 border-l border-slate-200">
+                                    <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Assigned Fleet Courier</p>
+                                    <div class="text-xs flex items-center gap-0.5 flex-wrap">${riderProfileHtml}</div>
+                                </div>
+
+                                <div class="flex items-center justify-between sm:justify-end gap-5 w-full sm:w-auto">
+                                    <div class="text-right">
+                                        <span class="px-2.5 py-0.5 rounded-md text-[9px] font-black tracking-widest uppercase ${badgeColor}">${rStatus}</span>
+                                    </div>
+                                    <div id="icon-${o.id}" class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200 shrink-0 transition-transform duration-300">
+                                        <i class="fas fa-chevron-down text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="details-${o.id}" class="order-details">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                                    
+                                    <div class="space-y-4">
+                                        <div class="block md:hidden bg-slate-50 p-4 border border-slate-200 rounded-2xl">
+                                            <h4 class="text-xs font-black text-slate-800 uppercase">${o.customer_name}</h4>
+                                            <p class="text-[10px] text-slate-500 font-bold mt-1"><i class="fas fa-phone mr-1"></i>${o.customer_phone}</p>
+                                            <p class="text-[10px] text-slate-500 font-medium mt-2 border-t pt-2 border-slate-200"><i class="fas fa-map-pin mr-1 text-red-400"></i>${o.delivery_address}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5"><i class="fas fa-folder-open text-blue-500"></i> Order Attachments</p>
+                                            ${renderOrderMedia(o)}
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-2xl shadow-inner">
+                                            
+                                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                                <div class="bg-white border border-slate-200 p-2.5 rounded-xl col-span-2 md:col-span-1">
+                                                    <p class="text-[8px] text-slate-400 uppercase font-black mb-1">Item Bill (Editable)</p>
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="text-xs font-black text-slate-500">Rs.</span>
+                                                        <input type="number" id="item-price-${o.id}" value="${o.item_price || 0}" onclick="event.stopPropagation()" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1.5 text-xs font-black text-slate-800 outline-none focus:border-blue-500 transition-all">
+                                                        <button onclick="event.stopPropagation(); updateItemPrice('${o.id}', ${o.dc_amount || 0}, ${o.previous_due || 0})" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded text-[9px] font-black transition-all shadow-md active:scale-95">SAVE</button>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="grid grid-cols-2 gap-2 col-span-2 md:col-span-1">
+                                                    <div class="bg-white border border-slate-200 p-2.5 rounded-xl text-center flex flex-col justify-center">
+                                                        <p class="text-[8px] text-slate-400 uppercase font-black">Delivery (DC)</p>
+                                                        <p class="text-sm font-black text-slate-800 mt-0.5">Rs. ${o.dc_amount || 0}</p>
+                                                    </div>
+                                                    <div class="bg-white border border-slate-200 p-2.5 rounded-xl text-center flex flex-col justify-center">
+                                                        <p class="text-[8px] text-orange-500 uppercase font-black">Old Dues</p>
+                                                        <p class="text-sm font-black text-orange-600 mt-0.5">Rs. ${o.previous_due || 0}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="bg-slate-900 p-3.5 rounded-xl text-center shadow-md mb-4">
+                                                <p class="text-[8px] text-slate-400 uppercase font-black tracking-widest">Total Collected Balance Due</p>
+                                                <p class="text-xl text-emerald-400 font-extrabold tracking-tight mt-0.5">Rs. ${o.bill_amount || 0}</p>
+                                            </div>
+
+                                            ${o.bill_image ? `
+                                            <div class="mb-2">
+                                                <p class="text-[8px] text-slate-400 uppercase font-black mb-1.5">Rider Uploaded Invoice / Parchi</p>
+                                                <div class="relative rounded-xl overflow-hidden border border-slate-200 bg-white group cursor-zoom-in shadow-sm" onclick="event.stopPropagation(); showImg('${o.bill_image}')">
+                                                    <img src="${o.bill_image}" class="w-full h-32 object-cover transition-transform group-hover:scale-105">
+                                                    <div class="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><span class="bg-white/90 text-slate-800 font-bold text-[9px] px-3 py-1.5 rounded-lg uppercase tracking-wider shadow-md border"><i class="fas fa-search-plus mr-1"></i> View Receipt</span></div>
+                                                </div>
+                                            </div>
+                                            ` : `<div class="text-center py-4 bg-orange-50/40 border border-orange-100 rounded-xl text-[9px] font-black text-orange-500 uppercase tracking-widest"><i class="fas fa-receipt mr-1"></i> Awaiting Shop Invoice Snap From Courier</div>`}
+                                        </div>
+
+                                        <div class="grid grid-cols-3 gap-3 pt-2">
+                                            <button onclick="event.stopPropagation(); openForwardModal('${o.id}')" class="py-3 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5">
+                                                <i class="fas fa-route"></i> Forward
+                                            </button>
+                                            <button onclick="event.stopPropagation(); manualAlertRider('${o.id}', '${o.rider_phone}')" class="py-3 bg-orange-500 hover:bg-orange-600 text-white text-[9px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5">
+                                                <i class="fas fa-bell"></i> Alert
+                                            </button>
+                                            <button onclick="event.stopPropagation(); cancelOrder('${o.id}')" class="py-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5">
+                                                <i class="fas fa-times"></i> Abort
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) { document.getElementById('ordersList').innerHTML = `<div class="text-center py-20 text-red-500 font-bold uppercase tracking-widest text-[10px] premium-card rounded-[2rem]">Sync Failed</div>`; }
+        }
+
+        // --- NEW: EDITABLE BILL LOGIC (REALTIME SYNC) ---
+        async function updateItemPrice(orderId, dcAmount, prevDue) {
+            const priceInput = document.getElementById(`item-price-${orderId}`);
+            const newItemPrice = parseFloat(priceInput.value) || 0;
+            const newBillAmount = newItemPrice + parseFloat(dcAmount) + parseFloat(prevDue);
+
+            showToast("Updating Bill Amount...", "success");
+            try {
+                const { error } = await _supabase.from('orders').update({
+                    item_price: newItemPrice,
+                    bill_amount: newBillAmount,
+                    updated_at: new Date().toISOString()
+                }).eq('id', orderId);
+
+                if (error) throw error;
+                showToast("Bill Updated! Live Synced with Customer & Rider.");
+            } catch (err) {
+                console.log(err);
+                showToast("Failed to update bill", "error");
+            }
+        }
+
+        async function sendNotification(phone, msgTitle, msgBody) {
+            try { await _supabase.from('notifications').insert([{ phone: phone, title: msgTitle, message: msgBody, created_at: new Date().toISOString() }]); } 
+            catch (e) {}
+        }
+
+        async function manualAlertRider(id, phoneStr) {
+            if(!phoneStr || phoneStr === 'undefined' || phoneStr === 'null' || phoneStr.trim() === '') {
+                return showToast("No rider assigned to this order yet!", "error");
+            }
+            const customMessage = prompt(`Send Alert to ${phoneStr}:\nWrite your message below:`, "Aapka order late ho raha hai, bara-e-meharbani jaldi deliver karein!");
+            if (!customMessage) return;
+
+            showToast("Transmitting alert to rider...");
+            await sendNotification(phoneStr, "🚨 System Warning", customMessage);
+            showToast("Alert Successfully Sent!");
+        }
+
+        async function openForwardModal(orderId) {
+            targetForwardOrderId = orderId;
+            document.getElementById('forwardModal').classList.replace('hidden', 'flex');
+            document.getElementById('riderSearchInput').value = "";
+            const container = document.getElementById('ridersContainer');
+            container.innerHTML = `<div class="text-center py-10 opacity-50"><i class="fas fa-circle-notch fa-spin text-xl mb-2 text-slate-900"></i><br><span class="text-[10px] font-bold uppercase tracking-widest">Scanning Available Fleet...</span></div>`;
+
+            try {
+                const { data: onlineRiders, error } = await _supabase.from('riders').select('*').eq('shift_status', 'active').order('name', { ascending: true });
+                if (error) throw error;
+                globalOnlineRiders = onlineRiders || [];
+                renderRidersModalList();
+            } catch(err) { container.innerHTML = `<div class="text-center py-10 text-red-500 font-bold text-xs">Failed to access fleet tracking data.</div>`; }
+        }
+
+        function renderRidersModalList() {
+            const container = document.getElementById('ridersContainer');
+            if (globalOnlineRiders.length === 0) { container.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border border-slate-200 p-6"><i class="fas fa-user-slash text-slate-300 text-3xl mb-2"></i><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">No riders currently online.</p></div>`; return; }
+
+            container.innerHTML = globalOnlineRiders.map(rider => {
+                const activeJobsCount = globalActiveOrders.filter(o => String(o.rider_phone).trim() === String(rider.phone).trim()).length;
+                let loadBadgeHtml = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"><i class="fas fa-check mr-1"></i>Free</span>`;
+                if(activeJobsCount > 0) loadBadgeHtml = `<span class="bg-orange-50 text-orange-600 border border-orange-200 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"><i class="fas fa-tasks mr-1"></i>${activeJobsCount} Active</span>`;
+
+                return `
+                    <div onclick="executeForwardTransmission('${rider.phone}', '${rider.rider_id}')" class="rider-row-node bg-white border border-slate-200 hover:border-blue-400 p-4 rounded-2xl flex justify-between items-center cursor-pointer transition-all active:scale-[0.99] shadow-sm">
+                        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-slate-900 text-white font-black text-sm flex items-center justify-center uppercase">${rider.name.charAt(0)}</div><div><h4 class="text-xs font-extrabold text-slate-800 uppercase rider-name-txt">${rider.name}</h4><p class="text-[9px] text-slate-400 font-bold tracking-widest uppercase mt-0.5 rider-id-txt"><span class="text-blue-500 font-extrabold">${rider.rider_id}</span> • ${rider.phone}</p></div></div>
+                        <div class="text-right">${loadBadgeHtml}</div>
+                    </div>`;
+            }).join('');
+        }
+
+        function filterRidersList() {
+            const query = document.getElementById('riderSearchInput').value.toLowerCase().trim();
+            document.querySelectorAll('.rider-row-node').forEach(row => {
+                const name = row.querySelector('.rider-name-txt').innerText.toLowerCase();
+                const idPhone = row.querySelector('.rider-id-txt').innerText.toLowerCase();
+                row.style.display = (name.includes(query) || idPhone.includes(query)) ? 'flex' : 'none';
+            });
+        }
+
+        window.closeForwardModal = () => document.getElementById('forwardModal').classList.replace('flex', 'hidden');
+
+        async function executeForwardTransmission(riderPhone, riderIdStr) {
+            if(!targetForwardOrderId) return;
+            if(confirm(`Forward this order package to rider ${riderIdStr}?`)) {
+                closeForwardModal(); showToast("Re-routing logistical package...");
+                try {
+                    const { error } = await _supabase.from('orders').update({ rider_phone: riderPhone.trim(), rider_id: riderIdStr.trim(), status: 'assigned', rider_status: 'Assigned (Forwarded)', updated_at: new Date().toISOString() }).eq('id', targetForwardOrderId);
+                    if(error) throw error; showToast("Order routed successfully!"); 
+                } catch(e) { showToast(e.message, 'error'); }
+            }
+        }
+
+        async function cancelOrder(id) {
+            const reason = prompt("Enter mission termination reason:");
+            if(!reason) return;
+            if(confirm("Terminate total logistical order sequence?")) {
+                showToast("Transmitting terminal kill code...", 'error');
+                try {
+                    const { error } = await _supabase.from('orders').update({ status: 'canceled', order_details: `CANCELLED BY ADMIN - Reason: ${reason}`, updated_at: new Date().toISOString() }).eq('id', id);
+                    if(error) throw error; showToast("Order Terminated.", 'error'); 
+                } catch(e) { showToast(e.message, 'error'); }
+            }
+        }
+
+        function calculateLiveCountdowns() {
+            const now = new Date();
+            const totalAllocatedTimeWindow = globalDeliveryTimerMinutes * 60; 
+
+            document.querySelectorAll('.live-timer').forEach(el => {
+                const status = el.getAttribute('data-status');
+                const riderStatus = el.getAttribute('data-rider-status'); 
+                
+                const startTime = new Date(el.getAttribute('data-start')); 
+                const stopTime = new Date(el.getAttribute('data-stop')); 
+                
+                const cardNodeId = el.id.replace('timer-el-', 'order-card-');
+                const cardContainerElement = document.getElementById(cardNodeId);
+                const timerWrapperBlock = el.parentElement;
+                const iconNode = timerWrapperBlock.querySelector('.timer-icon');
+
+                let elapsedSeconds = 0;
+                let isFrozen = false;
+                let isWaiting = false;
+
+                if (status === 'arrived' || riderStatus === 'arrived' || status === 'completed') {
+                    elapsedSeconds = Math.floor((stopTime - startTime) / 1000);
+                    isFrozen = true;
+                } 
+                else if (status === 'assigned' || riderStatus === 'accepted' || status === 'purchasing' || status === 'processing') {
+                    elapsedSeconds = Math.floor((now - startTime) / 1000);
+                } 
+                else {
+                    isWaiting = true;
+                }
+
+                if (elapsedSeconds < 0) elapsedSeconds = 0;
+                const remainingSeconds = totalAllocatedTimeWindow - elapsedSeconds;
+
+                if (isWaiting) {
+                    el.innerText = "AWAITING RIDER...";
+                    timerWrapperBlock.className = "flex items-center gap-1 mt-0.5 text-[10px] text-slate-400 font-extrabold tracking-widest id-timer-wrapper";
+                    iconNode.className = "fas fa-clock timer-icon";
+                    if(cardContainerElement) cardContainerElement.classList.remove('card-overtime');
+                } 
+                else if (isFrozen) {
+                    const h = Math.floor(elapsedSeconds / 3600);
+                    const m = Math.floor((elapsedSeconds % 3600) / 60).toString().padStart(2, '0');
+                    const s = (elapsedSeconds % 60).toString().padStart(2, '0');
+                    
+                    let timeTakenStr = h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
+                    
+                    el.innerText = `ARRIVED IN ${timeTakenStr}`; // FIXED TEXT HERE
+                    timerWrapperBlock.className = "flex items-center gap-1 mt-0.5 text-[10px] text-purple-600 font-extrabold tracking-widest id-timer-wrapper";
+                    iconNode.className = "fas fa-flag-checkered timer-icon"; 
+                    if(cardContainerElement) cardContainerElement.classList.remove('card-overtime');
+                } 
+                else {
+                    const displayMinutes = Math.floor(Math.abs(remainingSeconds) / 60).toString().padStart(2, '0');
+                    const displaySeconds = (Math.abs(remainingSeconds) % 60).toString().padStart(2, '0');
+                    
+                    if (remainingSeconds >= 0) {
+                        el.innerText = `${displayMinutes}:${displaySeconds}`;
+                        timerWrapperBlock.className = "flex items-center gap-1 mt-0.5 text-[10px] text-blue-600 font-extrabold tracking-widest id-timer-wrapper";
+                        iconNode.className = "fas fa-stopwatch timer-icon animate-spin";
+                        iconNode.style.animationDuration = '3s';
+                        if(cardContainerElement) cardContainerElement.classList.remove('card-overtime');
+                    } else {
+                        el.innerText = `-${displayMinutes}:${displaySeconds}`;
+                        timerWrapperBlock.className = "flex items-center gap-1 mt-0.5 text-[10px] text-red-600 font-black tracking-widest id-timer-wrapper animate-pulse";
+                        iconNode.className = "fas fa-exclamation-circle timer-icon";
+                        if(cardContainerElement && !cardContainerElement.classList.contains('card-overtime')) cardContainerElement.classList.add('card-overtime');
+
+                        if (el.getAttribute('data-alert-sent') === 'false') {
+                            const riderPh = el.getAttribute('data-rider-phone');
+                            if (riderPh && riderPh !== 'null' && riderPh !== 'undefined') {
+                                sendNotification(riderPh, "⏳ TIME UP WARNING!", `Order #${cardNodeId.slice(-6).toUpperCase()} is getting late!`);
+                            }
+                            el.setAttribute('data-alert-sent', 'true');
+                        }
+                    }
+                }
+            });
+        }
+
+        window.onload = async () => { 
+            await fetchDeliveryTimer();
+            loadActiveOrders();
+            setInterval(calculateLiveCountdowns, 1000);
+            
+            const liveChannel = _supabase.channel('admin-operations-terminal');
+            liveChannel.on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => { loadActiveOrders(); })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'riders' }, () => {
+                if(document.getElementById('forwardModal').style.display === 'flex' && targetForwardOrderId) openForwardModal(targetForwardOrderId);
+            })
+            .subscribe((status) => {
+                if(status === 'SUBSCRIBED') {
+                    const ping = document.querySelector('.animate-ping');
+                    const dot = ping ? ping.nextElementSibling : null;
+                    if(ping) ping.classList.replace('bg-blue-400', 'bg-emerald-400');
+                    if(dot) dot.classList.replace('bg-blue-500', 'bg-emerald-500');
+                }
+            }); 
+        };
+    </script>
+</body>
+</html>

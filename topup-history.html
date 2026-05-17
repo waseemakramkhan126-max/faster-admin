@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Topup History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: white; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+    </style>
+</head>
+<body class="p-4 flex flex-col min-h-screen">
+
+    <header class="flex justify-between items-center mb-8 pt-2 max-w-4xl mx-auto w-full border-b border-white/10 pb-4">
+        <div class="flex items-center gap-3">
+            <button onclick="location.href='admin-topups.html'" class="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center text-slate-400 active:scale-90 transition-transform">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center shadow-lg">
+                <i class="fas fa-history text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-black text-white tracking-widest">TOP-UP <span class="text-slate-400">HISTORY</span></h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto w-full space-y-4 flex-1 pb-10" id="historyList">
+        <div class="py-20 text-center opacity-30 text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+            Loading Ledger...
+        </div>
+    </main>
+
+    <div id="imgModal" class="hidden fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
+        <img id="fullImg" src="" class="max-w-full max-h-full rounded-lg shadow-2xl border-4 border-white/10">
+        <p class="absolute bottom-10 text-white/50 text-xs font-bold uppercase tracking-widest">Click anywhere to close</p>
+    </div>
+
+    <script>
+        const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        async function loadHistory() {
+            try {
+                // Status NOT EQUAL TO 'pending' (Matalab sirf Approved/Rejected aayega)
+                const { data, error } = await _supabase
+                    .from('topup_requests')
+                    .select('*')
+                    .neq('status', 'pending')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (data.length === 0) {
+                    document.getElementById('historyList').innerHTML = `<div class="text-center py-20 opacity-20 font-black uppercase text-xs"><i class="fas fa-receipt text-3xl mb-3 text-slate-500"></i><br>No History Found</div>`;
+                    return;
+                }
+
+                const phoneList = [...new Set(data.map(req => req.customer_phone.trim()))];
+                let custData = [];
+                if (phoneList.length > 0) {
+                    const { data: cData } = await _supabase.from('customers').select('phone, name').in('phone', phoneList);
+                    if (cData) custData = cData;
+                }
+
+                const finalData = data.map(req => {
+                    const cust = custData.find(c => c.phone && c.phone.trim() === req.customer_phone.trim());
+                    return { ...req, customer_name: cust ? cust.name : 'Unknown User' };
+                });
+
+                renderList(finalData);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('historyList').innerHTML = `<div class="text-center py-20 text-red-500 font-bold text-xs uppercase">Error loading history</div>`;
+            }
+        }
+
+        function renderList(data) {
+            const container = document.getElementById('historyList');
+            container.innerHTML = data.map(req => {
+                const isApproved = req.status.toLowerCase() === 'approved';
+                const statusColor = isApproved ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20';
+                
+                return `
+                <div class="glass-card p-5 rounded-[2rem] mb-4 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <img src="${req.proof_image}" onclick="showImg('${req.proof_image}')" class="w-12 h-12 object-cover rounded-xl border border-white/10 hover:border-slate-500 cursor-pointer shadow-lg shrink-0">
+                        <div>
+                            <h3 class="font-black text-white text-sm tracking-tight">${req.customer_name}</h3>
+                            <p class="text-[10px] text-slate-400 font-bold">${req.customer_phone}</p>
+                            <p class="text-[9px] text-slate-500 uppercase mt-1"><i class="fas fa-clock mr-1"></i>${new Date(req.created_at).toLocaleString()}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <span class="text-sm font-black text-white block mb-1">Rs. ${req.amount}</span>
+                        <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${statusColor}">
+                            ${req.status}
+                        </span>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function showImg(url) {
+            document.getElementById('fullImg').src = url;
+            document.getElementById('imgModal').classList.remove('hidden');
+        }
+
+        window.onload = loadHistory;
+    </script>
+</body>
+</html>
