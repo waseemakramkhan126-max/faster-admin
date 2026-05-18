@@ -53,7 +53,7 @@
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                 <div>
                     <p class="text-[10px] text-slate-400 font-black uppercase tracking-wider">Filter List View</p>
-                    <select id="statusFilter" onchange="filterRequests(this.value)" class="mt-1 block w-full text-xs font-bold rounded-lg border-slate-200 bg-slate-50 p-2 focus:outline-none">
+                    <select id="statusFilter" onchange="filterRequests()" class="mt-1 block w-full text-xs font-bold rounded-lg border-slate-200 bg-slate-50 p-2 focus:outline-none">
                         <option value="all">Show All Requests</option>
                         <option value="pending" selected>Pending Only</option>
                         <option value="approved">Approved Only</option>
@@ -71,8 +71,8 @@
             </span>
         </div>
 
-        <div id="requestsContainer" class="space-y-4">
-            <div class="text-center py-20 bg-white rounded-3xl border shadow-sm opacity-4xl text-xs font-bold uppercase tracking-wider text-slate-400">
+        <div id="requestsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="col-span-full text-center py-20 bg-white rounded-3xl border shadow-sm text-xs font-bold uppercase tracking-wider text-slate-400">
                 <i class="fas fa-spinner fa-spin text-lg mb-2 block"></i> Loading Requests...
             </div>
         </div>
@@ -99,7 +99,7 @@
                 renderRequests();
             } catch (err) {
                 console.error("Fetch Error:", err);
-                document.getElementById('requestsContainer').innerHTML = `<div class="text-center p-10 text-red-500 font-bold text-xs">Error loading data. Check console.</div>`;
+                document.getElementById('requestsContainer').innerHTML = `<div class="col-span-full text-center p-10 text-red-500 font-bold text-xs">Error loading data. Check console.</div>`;
             }
         }
 
@@ -127,7 +127,7 @@
             }
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="text-center py-16 bg-white rounded-3xl border border-dashed text-xs font-bold uppercase text-slate-400">No requests found matching criteria</div>`;
+                container.innerHTML = `<div class="col-span-full text-center py-16 bg-white rounded-3xl border border-dashed text-xs font-bold uppercase text-slate-400">No requests found matching criteria</div>`;
                 return;
             }
 
@@ -136,27 +136,25 @@
                 let statusBadge = '';
                 let actionArea = '';
 
-                // Setting up dynamic badges based on status
                 if (status === 'pending') {
                     statusBadge = `<span class="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-amber-100 text-amber-700 border border-amber-300">PENDING</span>`;
                     
-                    // Admin Action Box inside the card
                     actionArea = `
                         <div class="mt-5 pt-4 border-t border-slate-100 space-y-3">
                             <div>
-                                <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Bank Reference ID / Screenshot URL / Bank Confirmation Msg</label>
-                                <input type="text" id="ref_${req.id}" placeholder="Enter Txn ID or Bank message code..." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-slate-50">
+                                <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Bank Reference ID / Confirmation Memo</label>
+                                <input type="text" id="ref_${req.id}" placeholder="Enter Transaction ID or msg details..." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-slate-50">
                             </div>
                             <div>
-                                <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Cancellation Reason (Only if rejecting)</label>
-                                <input type="text" id="reason_${req.id}" placeholder="e.g. Invalid account title or insufficient funds" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500 bg-slate-50">
+                                <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Cancellation Reason (If rejecting)</label>
+                                <input type="text" id="reason_${req.id}" placeholder="e.g. Invalid account title or Details" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500 bg-slate-50">
                             </div>
                             <div class="flex gap-2 pt-1">
                                 <button onclick="processAction(${req.id}, 'cancelled')" class="flex-1 bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors border border-red-200">
-                                    <i class="fas fa-times mr-1"></i> Cancel Request
+                                    <i class="fas fa-times mr-1"></i> Cancel
                                 </button>
                                 <button onclick="processAction(${req.id}, 'approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors shadow-sm">
-                                    <i class="fas fa-check mr-1"></i> Approve & Disburse
+                                    <i class="fas fa-check mr-1"></i> Approve
                                 </button>
                             </div>
                         </div>
@@ -166,7 +164,7 @@
                     actionArea = `
                         <div class="mt-3 p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 text-[11px]">
                             <span class="font-bold text-slate-500 block uppercase text-[8px] mb-0.5">Admin Reference Memo:</span>
-                            <span class="font-extrabold text-emerald-800"><i class="fas fa-receipt mr-1"></i> ${req.admin_reference || 'N/A (No Reference Provided)'}</span>
+                            <span class="font-extrabold text-emerald-800"><i class="fas fa-receipt mr-1"></i> ${req.admin_reference || 'Success'}</span>
                         </div>
                     `;
                 } else {
@@ -174,13 +172,124 @@
                     actionArea = `
                         <div class="mt-3 p-3 bg-red-50/50 rounded-xl border border-red-100 text-[11px]">
                             <span class="font-bold text-slate-500 block uppercase text-[8px] mb-0.5">Reason for Cancellation:</span>
-                            <span class="font-extrabold text-red-800"><i class="fas fa-exclamation-circle mr-1"></i> ${req.cancel_reason || 'No specific reason given'}</span>
+                            <span class="font-extrabold text-red-800"><i class="fas fa-exclamation-circle mr-1"></i> ${req.cancel_reason || 'No reason specified'}</span>
                         </div>
                     `;
                 }
 
                 return `
-                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm animate-pop">
-                        <div class="flex justify-between items-start border-b border-slate-50 pb-3 mb-3">
-                            <div>
-                                <span class="text-[9px] font-black text
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm animate-pop flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start border-b border-slate-50 pb-3 mb-3">
+                                <div>
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Customer Phone</span>
+                                    <h4 class="font-extrabold text-slate-800 text-sm">${req.customer_phone}</h4>
+                                    <p class="text-[9px] text-slate-400 font-bold mt-0.5">${new Date(req.created_at).toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl text-xs">
+                                <div>
+                                    <span class="block text-[8px] font-bold text-slate-400 uppercase">Bank / Wallet</span>
+                                    <span class="font-extrabold text-slate-700">${req.bank_name}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[8px] font-bold text-slate-400 uppercase">Amount Request</span>
+                                    <span class="font-black text-blue-600">Rs. ${req.amount}</span>
+                                </div>
+                                <div class="col-span-2 border-t border-slate-200/60 pt-1.5 flex justify-between items-center">
+                                    <div>
+                                        <span class="block text-[8px] font-bold text-slate-400 uppercase">Account Title</span>
+                                        <span id="title_${req.id}" class="font-bold text-slate-700">${req.account_title}</span>
+                                    </div>
+                                    <button onclick="copyText('title_${req.id}')" class="text-[10px] text-blue-600 bg-blue-50 px-2 py-1 rounded-md hover:bg-blue-100 font-bold transition-all"><i class="fas fa-copy"></i> Copy</button>
+                                </div>
+                                <div class="col-span-2 border-t border-slate-200/60 pt-1.5 flex justify-between items-center">
+                                    <div>
+                                        <span class="block text-[8px] font-bold text-slate-400 uppercase">Account Number</span>
+                                        <span id="num_${req.id}" class="font-extrabold text-slate-800 tracking-wider">${req.account_number}</span>
+                                    </div>
+                                    <button onclick="copyText('num_${req.id}')" class="text-[10px] text-blue-600 bg-blue-50 px-2 py-1 rounded-md hover:bg-blue-100 font-bold transition-all"><i class="fas fa-copy"></i> Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${actionArea}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Copy Feature
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copied: " + text);
+            }).catch(err => console.error("Error copying text: ", err));
+        }
+
+        // Approve / Cancel Action Function
+        async function processAction(id, action) {
+            let refVal = "";
+            let reasonVal = "";
+
+            if (action === 'approved') {
+                refVal = document.getElementById(`ref_${id}`).value.trim();
+                if (!refVal) {
+                    alert("Please fill the Bank Reference / Message details box first!");
+                    return;
+                }
+            } else if (action === 'cancelled') {
+                reasonVal = document.getElementById(`reason_${id}`).value.trim();
+                if (!reasonVal) {
+                    alert("Please provide a cancellation reason!");
+                    return;
+                }
+            }
+
+            if (!confirm(`Are you sure you want to change status to ${action.toUpperCase()}?`)) return;
+
+            const updateData = {
+                status: action,
+                admin_reference: action === 'approved' ? refVal : null,
+                cancel_reason: action === 'cancelled' ? reasonVal : null
+            };
+
+            try {
+                const { error } = await _supabase
+                    .from('withdraw_requests')
+                    .update(updateData)
+                    .eq('id', id);
+
+                if (error) throw error;
+                
+                alert(`Request successfully ${action}!`);
+                fetchRequests(); // Reload data across local layout
+            } catch (err) {
+                console.error("Operation Error:", err);
+                alert("Something went wrong. Please check console logs.");
+            }
+        }
+
+        // Realtime Tracker Setup
+        function setupLiveSync() {
+            _supabase.channel('admin-withdraw-channel')
+                .on('postgres_changes', { 
+                    event: '*', 
+                    schema: 'public', 
+                    table: 'withdraw_requests' 
+                }, () => {
+                    fetchRequests(); // Auto sync list data live
+                }).subscribe();
+        }
+
+        window.onload = () => {
+            fetchRequests();
+            setupLiveSync();
+        };
+    </script>
+</body>
+</html>
