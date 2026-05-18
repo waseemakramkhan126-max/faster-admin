@@ -131,7 +131,7 @@
                 // Charo queries ek sath bheji ja rahi hain (Speed ke liye)
                 const [allRes, activeRes, compRes, cancRes] = await Promise.all([
                     _supabase.from('orders').select('id', { count: 'exact', head: true }), // All
-                    _supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['assigned', 'processing', 'pending']), // Active
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).not('status', 'in', '("pending","completed","canceled","cancelled","CANCELLED")'), // Active
                     _supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'completed'), // Completed
                     _supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['canceled', 'cancelled', 'CANCELLED']) // Canceled
                 ]);
