@@ -146,6 +146,10 @@
                                 <input type="text" id="ref_${req.id}" placeholder="Enter Transaction ID or msg details..." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-slate-50">
                             </div>
                             <div>
+                                <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Upload Transfer Proof (Receipt Image)</label>
+                                <input type="file" id="file_${req.id}" accept="image/*" class="w-full text-xs p-2 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 bg-slate-50">
+                            </div>
+                            <div>
                                 <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Cancellation Reason (If rejecting)</label>
                                 <input type="text" id="reason_${req.id}" placeholder="e.g. Invalid account title or Details" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500 bg-slate-50">
                             </div>
@@ -153,7 +157,7 @@
                                 <button onclick="processAction(${req.id}, 'cancelled')" class="flex-1 bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors border border-red-200">
                                     <i class="fas fa-times mr-1"></i> Cancel
                                 </button>
-                                <button onclick="processAction(${req.id}, 'approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors shadow-sm">
+                                <button id="btn_approve_${req.id}" onclick="processAction(${req.id}, 'approved')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors shadow-sm">
                                     <i class="fas fa-check mr-1"></i> Approve
                                 </button>
                             </div>
@@ -162,9 +166,19 @@
                 } else if (status === 'approved') {
                     statusBadge = `<span class="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-700 border border-emerald-300">APPROVED</span>`;
                     actionArea = `
-                        <div class="mt-3 p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 text-[11px]">
-                            <span class="font-bold text-slate-500 block uppercase text-[8px] mb-0.5">Admin Reference Memo:</span>
-                            <span class="font-extrabold text-emerald-800"><i class="fas fa-receipt mr-1"></i> ${req.admin_reference || 'Success'}</span>
+                        <div class="mt-3 p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 text-[11px] space-y-2">
+                            <div>
+                                <span class="font-bold text-slate-500 block uppercase text-[8px] mb-0.5">Admin Reference Memo:</span>
+                                <span class="font-extrabold text-emerald-800"><i class="fas fa-receipt mr-1"></i> ${req.admin_reference || 'Success'}</span>
+                            </div>
+                            ${req.admin_snapshot_url ? `
+                            <div>
+                                <span class="font-bold text-slate-500 block uppercase text-[8px] mb-1">Transfer Proof Image:</span>
+                                <a href="${req.admin_snapshot_url}" target="_blank" class="inline-block">
+                                    <img src="${req.admin_snapshot_url}" class="w-16 h-16 object-cover rounded-lg border border-slate-200 hover:scale-105 transition-transform shadow-sm">
+                                </a>
+                            </div>
+                            ` : ''}
                         </div>
                     `;
                 } else {
@@ -235,6 +249,7 @@
         async function processAction(id, action) {
             let refVal = "";
             let reasonVal = "";
+            let uploadedImageUrl = null;
 
             if (action === 'approved') {
                 refVal = document.getElementById(`ref_${id}`).value.trim();
@@ -242,20 +257,63 @@
                     alert("Please fill the Bank Reference / Message details box first!");
                     return;
                 }
+
+                // File Upload Selection Check
+                const fileInput = document.getElementById(`file_${id}`);
+                const file = fileInput ? fileInput.files[0] : null;
+                if (!file) {
+                    alert("Please select/upload a transfer proof picture first!");
+                    return;
+                }
+
+                if (!confirm(`Are you sure you want to change status to APPROVED and upload proof?`)) return;
+
+                // UI loading state indicators
+                const btnApprove = document.getElementById(`btn_approve_${id}`);
+                btnApprove.innerText = "Uploading...";
+                btnApprove.disabled = true;
+
+                try {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${id}_${Date.now()}.` + fileExt;
+                    const filePath = `proofs/${fileName}`;
+
+                    // Uploading image file to Supabase Storage Bucket 'withdraw_proofs'
+                    const { data: uploadData, error: uploadError } = await _supabase.storage
+                        .from('withdraw_proofs')
+                        .upload(filePath, file);
+
+                    if (uploadError) throw uploadError;
+
+                    // Fetching Public Url endpoint link
+                    const { data: urlData } = _supabase.storage
+                        .from('withdraw_proofs')
+                        .getPublicUrl(filePath);
+
+                    uploadedImageUrl = urlData.publicUrl;
+
+                } catch (uploadErr) {
+                    console.error("Upload Failed:", uploadErr);
+                    alert("Image upload failed! Please make sure 'withdraw_proofs' bucket is Public.");
+                    btnApprove.innerText = "Approve";
+                    btnApprove.disabled = false;
+                    return;
+                }
+
             } else if (action === 'cancelled') {
                 reasonVal = document.getElementById(`reason_${id}`).value.trim();
                 if (!reasonVal) {
                     alert("Please provide a cancellation reason!");
                     return;
                 }
+                if (!confirm(`Are you sure you want to change status to CANCELLED?`)) return;
             }
-
-            if (!confirm(`Are you sure you want to change status to ${action.toUpperCase()}?`)) return;
 
             const updateData = {
                 status: action,
                 admin_reference: action === 'approved' ? refVal : null,
-                cancel_reason: action === 'cancelled' ? reasonVal : null
+                cancel_reason: action === 'cancelled' ? reasonVal : null,
+                admin_snapshot_url: action === 'approved' ? uploadedImageUrl : null
             };
 
             try {
@@ -267,7 +325,7 @@
                 if (error) throw error;
                 
                 alert(`Request successfully ${action}!`);
-                fetchRequests(); // Reload data across local layout
+                fetchRequests(); // Reload layout structure data stream
             } catch (err) {
                 console.error("Operation Error:", err);
                 alert("Something went wrong. Please check console logs.");
