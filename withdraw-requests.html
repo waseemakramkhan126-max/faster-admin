@@ -279,9 +279,13 @@
                     const filePath = `proofs/${fileName}`;
 
                     // Uploading image file to Supabase Storage Bucket 'withdraw_proofs'
-                    const { data: uploadData, error: uploadError } = await _supabase.storage
-                        .from('withdraw_proofs')
-                        .upload(filePath, file);
+                  const { data: uploadData, error: uploadError } = await _supabase.storage
+                         .from('withdraw_proofs')
+                         .upload(filePath, file, {
+                          cacheControl: '3600',
+                           upsert: false,
+                     contentType: file.type // <--- YEH LINE MOBILE ERRORS KO FIX KAREGI
+                  });
 
                     if (uploadError) throw uploadError;
 
