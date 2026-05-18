@@ -242,22 +242,28 @@
             }
         }
 
-        // 3. Live Listener
         function setupTopupListener() {
-            _supabase.channel('dashboard-topup-badge')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'topup_requests' }, () => {
-                    fetchPendingTopupsCount(); // Jab bhi naya top-up aye, count update kar do
-                })
-                .subscribe();
-        }
+    _supabase.channel('dashboard-topup-badge')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'topup_requests' }, () => {
+            fetchPendingTopupsCount(); // Live update for top-up
+        })
+        .subscribe();
+}
 
-        // Jab page load ho to functions start karein
-        window.addEventListener('load', () => {
-            fetchPendingTopupsCount();
-            setupTopupListener();
-        });
-        setInterval(updateTime, 1000);
-        updateTime();
+// 3. JAB PAGE LOAD HO (Dono Realtime Ek Sath Start Honge)
+window.addEventListener('load', () => {
+    // Top-up status active
+    if (typeof fetchPendingTopupsCount === 'function') fetchPendingTopupsCount();
+    setupTopupListener();
+
+    // Withdraw status active
+    updateWithdrawBadgeCount();
+    setupDashboardRealtime();
+});
+
+// 4. CLOCK TIME FUNCTION (Aapka Purana Code)
+setInterval(updateTime, 1000);
+updateTime();
     </script>
 </body>
 </html>
