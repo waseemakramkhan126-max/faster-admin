@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faster - Delivery Charges Admin</title>
+    <title>Faster - Delivery & Timing Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,41 +16,62 @@
 
     <header class="bg-orange-600 p-4 text-white shadow-md flex justify-between items-center shrink-0">
         <div class="flex items-center gap-3">
-            <i class="fas fa-sliders text-xl"></i>
-            <h1 class="font-black tracking-wide uppercase text-sm">Faster Admin Panel</h1>
+            <i class="fas fa-clock-solid fa-clock text-xl"></i>
+            <h1 class="font-black tracking-wide uppercase text-sm">Faster Admin Control</h1>
         </div>
-        <span class="text-[10px] bg-orange-700 font-bold px-3 py-1 rounded-full uppercase tracking-widest">Delivery Matrix</span>
+        <span class="text-[10px] bg-orange-700 font-bold px-3 py-1 rounded-full uppercase tracking-widest">Timing & Status Matrix</span>
     </header>
 
-    <main class="flex-1 p-4 max-w-4xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+    <main class="flex-1 p-4 max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         
         <div class="md:col-span-1 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 h-fit">
             <h2 class="font-extrabold text-gray-900 text-base mb-4 flex items-center gap-2">
-                <i class="fas fa-plus-circle text-orange-500"></i> Add / Update Rate
+                <i class="fas fa-plus-circle text-orange-500"></i> Area Configuration
             </h2>
             
             <form id="rateForm" onsubmit="saveDeliveryRate(event)" class="flex flex-col gap-4">
                 <div>
                     <label class="text-xs font-black uppercase text-gray-500 tracking-wider block mb-1">Area Name</label>
                     <input type="text" id="areaInput" placeholder="e.g., Bahria Town" required
-                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-500 bg-gray-50 transition-colors">
+                        class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500 bg-gray-50">
                 </div>
 
                 <div>
                     <label class="text-xs font-black uppercase text-gray-500 tracking-wider block mb-1">Block / Sector</label>
-                    <input type="text" id="blockInput" placeholder="e.g., Block C or Sector F" required
-                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-500 bg-gray-50 transition-colors">
+                    <input type="text" id="blockInput" placeholder="e.g., Block C" required
+                        class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500 bg-gray-50">
                 </div>
 
                 <div>
                     <label class="text-xs font-black uppercase text-gray-500 tracking-wider block mb-1">Delivery Fee (Rs.)</label>
-                    <input type="number" id="feeInput" placeholder="e.g., 250" required min="0"
-                        class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-orange-500 bg-gray-50 transition-colors">
+                    <input type="number" id="feeInput" placeholder="e.g., 150" required min="0"
+                        class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500 bg-gray-50">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs font-black uppercase text-gray-500 tracking-wider block mb-1">Start Time</label>
+                        <input type="time" id="startTimeInput" value="09:00" required
+                            class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase text-gray-500 tracking-wider block mb-1">End Time</label>
+                        <input type="time" id="endTimeInput" value="23:00" required
+                            class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500 bg-gray-50">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-black uppercase text-gray-500 tracking-wider block mb-1">Service Status</label>
+                    <select id="statusInput" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-500 bg-gray-50 font-semibold">
+                        <option value="true" class="text-green-600 font-bold">Active (Open)</option>
+                        <option value="false" class="text-red-600 font-bold">Inactive (Close / Coming Soon)</option>
+                    </select>
                 </div>
 
                 <button type="submit" id="submitBtn" 
-                    class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-sm uppercase tracking-wider mt-2 transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-save"></i> Save Rate
+                    class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-sm uppercase tracking-wider mt-2 flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Save Config
                 </button>
             </form>
         </div>
@@ -58,28 +79,26 @@
         <div class="md:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="font-extrabold text-gray-900 text-base flex items-center gap-2">
-                    <i class="fas fa-list text-orange-500"></i> Active Area Matrix
+                    <i class="fas fa-map-marked-alt text-orange-500"></i> Active Area Matrix
                 </h2>
-                <div class="relative w-44">
-                    <input type="text" id="searchBar" oninput="filterRates()" placeholder="Filter area..." 
-                        class="w-full border border-gray-200 rounded-lg pl-8 pr-2 py-1 text-xs outline-none focus:border-orange-500">
-                    <i class="fas fa-search absolute left-2.5 top-2 text-gray-400 text-xs"></i>
-                </div>
+                <input type="text" id="searchBar" oninput="filterRates()" placeholder="Search area..." 
+                    class="border border-gray-200 rounded-lg px-3 py-1 text-xs outline-none focus:border-orange-500 w-44">
             </div>
 
-            <div class="flex-1 overflow-y-auto max-h-[60vh] border rounded-xl border-gray-100">
+            <div class="flex-1 overflow-y-auto max-h-[65vh] border rounded-xl border-gray-100">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-400 border-b border-gray-100">
-                            <th class="p-3">Area</th>
-                            <th class="p-3">Block</th>
+                            <th class="p-3">Area (Block)</th>
                             <th class="p-3">Charges</th>
+                            <th class="p-3">Timings</th>
+                            <th class="p-3">Status</th>
                             <th class="p-3 text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody id="rateTableBody" class="text-sm divide-y divide-gray-50">
                         <tr>
-                            <td colspan="4" class="p-6 text-center text-gray-400 font-bold">Loading area configurations...</td>
+                            <td colspan="5" class="p-6 text-center text-gray-400 font-bold">Loading...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -88,48 +107,43 @@
     </main>
 
     <script>
-        // --- Supabase Init using existing app details ---
         const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
-
         let allRates = [];
 
         async function loadRates() {
             try {
-                const { data, error } = await _supabase
-                    .from('delivery_rates')
-                    .select('*')
-                    .order('area', { ascending: true })
-                    .order('block', { ascending: true });
-
+                const { data, error } = await _supabase.from('delivery_rates').select('*').order('area', { ascending: true });
                 if (error) throw error;
                 allRates = data;
                 renderTable(allRates);
-            } catch (err) {
-                alert("Error loading data: " + err.message);
-            }
+            } catch (err) { alert(err.message); }
         }
 
         function renderTable(list) {
             const tbody = document.getElementById('rateTableBody');
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-gray-400 font-bold">No delivery matrix found. Create one!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-400">No data found.</td></tr>`;
                 return;
             }
             
-            tbody.innerHTML = list.map(row => `
-                <tr class="hover:bg-gray-50/80 transition-colors">
-                    <td class="p-3 font-bold text-gray-900">${row.area}</td>
-                    <td class="p-3 font-semibold text-gray-600">${row.block}</td>
+            tbody.innerHTML = list.map(row => {
+                const statusBadge = row.is_active 
+                    ? `<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-black uppercase">Live</span>`
+                    : `<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[10px] font-black uppercase">Closed</span>`;
+                
+                return `
+                <tr class="hover:bg-gray-50/80">
+                    <td class="p-3 font-bold text-gray-900">${row.area} <span class="text-xs font-normal text-gray-500">(${row.block})</span></td>
                     <td class="p-3 text-orange-600 font-black">Rs. ${row.delivery_fee}</td>
+                    <td class="p-3 font-semibold text-xs text-gray-600">${row.start_time?.substring(0,5)} - ${row.end_time?.substring(0,5)}</td>
+                    <td class="p-3">${statusBadge}</td>
                     <td class="p-3 text-center">
-                        <button onclick="deleteRate(${row.id})" class="text-red-500 hover:text-red-700 p-2 transition-colors active:scale-90">
-                            <i class="fas fa-trash-can"></i>
-                        </button>
+                        <button onclick="deleteRate(${row.id})" class="text-red-500 hover:text-red-700 p-2"><i class="fas fa-trash-can"></i></button>
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
         }
 
         async function saveDeliveryRate(e) {
@@ -138,50 +152,35 @@
             const area = document.getElementById('areaInput').value.trim();
             const block = document.getElementById('blockInput').value.trim();
             const fee = parseFloat(document.getElementById('feeInput').value);
+            const start_time = document.getElementById('startTimeInput').value + ":00";
+            const end_time = document.getElementById('endTimeInput').value + ":00";
+            const is_active = document.getElementById('statusInput').value === "true";
 
             btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Saving...`;
-
             try {
-                // Upsert logic (agar area aur block same hai to rate overwrite ho jayega)
-                const { error } = await _supabase
-                    .from('delivery_rates')
-                    .upsert([{ area, block, delivery_fee: fee }], { onConflict: 'area,block' });
+                const { error } = await _supabase.from('delivery_rates').upsert([{ 
+                    area, block, delivery_fee: fee, start_time, end_time, is_active 
+                }], { onConflict: 'area,block' });
 
                 if (error) throw error;
-
                 document.getElementById('rateForm').reset();
-                await loadRates();
-                alert("Delivery rate updated successfully! ✅");
-            } catch (err) {
-                alert("Save error: " + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-save"></i> Save Rate`;
-            }
+                loadRates();
+                alert("Settings Saved Successfully! ✅");
+            } catch (err) { alert(err.message); }
+            finally { btn.disabled = false; btn.innerHTML = `<i class="fas fa-save"></i> Save Config`; }
         }
 
         async function deleteRate(id) {
-            if(!confirm("Are you sure you want to delete this delivery rate?")) return;
-            try {
-                const { error } = await _supabase.from('delivery_rates').delete().eq('id', id);
-                if (error) throw error;
-                await loadRates();
-            } catch (err) {
-                alert("Delete error: " + err.message);
-            }
+            if(!confirm("Are you sure?")) return;
+            await _supabase.from('delivery_rates').delete().eq('id', id);
+            loadRates();
         }
 
         function filterRates() {
             const query = document.getElementById('searchBar').value.toLowerCase().trim();
-            const filtered = allRates.filter(r => 
-                r.area.toLowerCase().includes(query) || 
-                r.block.toLowerCase().includes(query)
-            );
-            renderTable(filtered);
+            renderTable(allRates.filter(r => r.area.toLowerCase().includes(query) || r.block.toLowerCase().includes(query)));
         }
 
-        // Run on start
         loadRates();
     </script>
 </body>
