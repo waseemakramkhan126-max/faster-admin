@@ -64,9 +64,16 @@
                  <span id="badge-receivables" class="absolute top-1/2 -translate-y-1/2 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded-lg">Rs. 0</span>
             </button>
     
-            <button onclick="switchTab('payables')" id="tab-payables" class="tab-btn tab-inactive py-5 pl-6 rounded-2xl font-black text-sm tracking-widest border shadow-sm relative flex items-center justify-start gap-2">
-                 <i class="fas fa-arrow-up text-emerald-400"></i> Advance (Credit)
-                 <span id="badge-payables" class="absolute top-1/2 -translate-y-1/2 right-4 bg-emerald-500 text-white text-xs px-3 py-1 rounded-lg">Rs. 0</span>
+            <button onclick="switchTab('payables')" id="tab-payables" 
+                  class="tab-btn tab-inactive py-4 pl-6 pr-6 rounded-2xl border shadow-sm relative flex flex-col items-start justify-center gap-0.5">
+    
+                  <div class="flex items-center gap-2 font-black text-sm tracking-widest">
+                  <i class="fas fa-arrow-up text-emerald-400"></i> Advance (Credit)
+                  </div>
+    
+                  <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Customer ko dene hai</span>
+    
+                  <span id="badge-payables" class="absolute top-1/2 -translate-y-1/2 right-4 bg-emerald-500 text-white text-xs px-3 py-1 rounded-lg">Rs. 0</span>
             </button>
     
             <button onclick="switchTab('revenue')" id="tab-revenue" class="tab-btn tab-inactive py-5 pl-6 rounded-2xl font-black text-sm tracking-widest border shadow-sm flex items-center justify-start gap-2">
