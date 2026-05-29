@@ -59,22 +59,27 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-             <button onclick="switchTab('receivables')" id="tab-receivables" class="tab-btn tab-active py-5 pl-6 rounded-2xl font-black text-sm tracking-widest border shadow-sm relative flex items-center justify-start gap-2">
-                 <i class="fas fa-arrow-down text-red-400"></i> Pending (Debt)
-                 <span id="badge-receivables" class="absolute top-1/2 -translate-y-1/2 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded-lg">Rs. 0</span>
-            </button>
+             <button onclick="switchTab('receivables')" id="tab-receivables" 
+    class="tab-btn tab-active py-4 pl-6 pr-6 rounded-2xl border shadow-sm relative flex flex-col items-start justify-center gap-0">
     
-            <button onclick="switchTab('payables')" id="tab-payables" 
-                  class="tab-btn tab-inactive py-4 pl-6 pr-6 rounded-2xl border shadow-sm relative flex flex-col items-start justify-center gap-0.5">
+    <div class="flex items-center gap-2 font-black text-sm tracking-widest">
+        <i class="fas fa-arrow-down text-red-400"></i> Pending (Debt)
+    </div>
+    <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest pl-7">Customer se lene hai</span>
     
-                  <div class="flex items-center gap-2 font-black text-sm tracking-widest">
-                  <i class="fas fa-arrow-up text-emerald-400"></i> Advance (Credit)
-                  </div>
+    <span id="badge-receivables" class="absolute top-1/2 -translate-y-1/2 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded-lg">Rs. 0</span>
+</button>
+
+<button onclick="switchTab('payables')" id="tab-payables" 
+    class="tab-btn tab-inactive py-4 pl-6 pr-6 rounded-2xl border shadow-sm relative flex flex-col items-start justify-center gap-0">
     
-                  <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Customer ko dene hai</span>
+    <div class="flex items-center gap-2 font-black text-sm tracking-widest">
+        <i class="fas fa-arrow-up text-emerald-400"></i> Advance (Credit)
+    </div>
+    <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest pl-7">Customer ko dene hai</span>
     
-                  <span id="badge-payables" class="absolute top-1/2 -translate-y-1/2 right-4 bg-emerald-500 text-white text-xs px-3 py-1 rounded-lg">Rs. 0</span>
-            </button>
+    <span id="badge-payables" class="absolute top-1/2 -translate-y-1/2 right-4 bg-emerald-500 text-white text-xs px-3 py-1 rounded-lg">Rs. 0</span>
+</button>
     
             <button onclick="switchTab('revenue')" id="tab-revenue" class="tab-btn tab-inactive py-5 pl-6 rounded-2xl font-black text-sm tracking-widest border shadow-sm flex items-center justify-start gap-2">
                  <i class="fas fa-chart-pie text-blue-400"></i> Revenue Split
