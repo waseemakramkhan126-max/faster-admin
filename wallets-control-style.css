@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+body { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    background-color: #f8fafc; 
+    color: #334155;
+}
+
+.premium-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card:hover { 
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08); 
+    border-color: #cbd5e1; 
+}
+
+.tab-btn { 
+    transition: all 0.3s ease; 
+}
+
+.tab-active { 
+    background-color: #0f172a; 
+    color: white; 
+    border-color: #0f172a; 
+}
+
+.tab-inactive { 
+    background-color: white; 
+    color: #64748b; 
+    border-color: #e2e8f0; 
+}
+
+.tab-inactive:hover { 
+    background-color: #f1f5f9; 
+}
+
+.toast-enter { 
+    transform: translate(-50%, 0); 
+    opacity: 1; 
+}
+
+.toast-leave { 
+    transform: translate(-50%, -150%); 
+    opacity: 0; 
+}
