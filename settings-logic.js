@@ -1,9 +1,8 @@
 // ==========================================
 // 1. SUPABASE INITIALIZATION
 // ==========================================
-// TODO: Replace with your actual project URL and Anon Key
-const supabaseUrl = "https://hkabhikizdlbavfkualt.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
+const supabaseUrl = 'https://hkabhikizdlbavfkualt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // DOM Elements
@@ -23,142 +22,209 @@ let currentLogoUrl = "";
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
     await fetchSettings();
+    await fetchAdminAreas(); // Load areas list on page start
 });
 
+// General Settings Fetcher
 async function fetchSettings() {
     try {
-        // Fetch App Settings (Timer, Commission, Logo)
-        const { data: appSettings, error: appError } = await supabase
-            .from('app_settings')
-            .select('*')
-            .single(); // Assuming single row for global settings
-
+        const { data: appData, error: appError } = await supabase.from('app_settings').select('*').eq('id', 1).single();
         if (appError && appError.code !== 'PGRST116') throw appError;
 
-        if (appSettings) {
-            commissionInput.value = appSettings.rider_commission || "";
-            timerInput.value = appSettings.delivery_timer || "";
-            if (appSettings.logo_url) {
-                currentLogoUrl = appSettings.logo_url;
+        if (appData) {
+            if (commissionInput) commissionInput.value = appData.rider_commission || "";
+            if (timerInput) timerInput.value = appData.delivery_timer || "";
+            if (appData.logo_url && logoPreview) {
+                currentLogoUrl = appData.logo_url;
                 logoPreview.src = currentLogoUrl;
             }
         }
 
-        // Fetch Delivery Area Fee (No default 150 hardcoded)
-        const { data: areaData, error: areaError } = await supabase
-            .from('delivery_areas')
-            .select('customer_delivery_fee')
-            .limit(1)
-            .single(); 
-
-        if (areaError && areaError.code !== 'PGRST116') throw areaError;
-
-        if (areaData) {
+        const { data: areaData, error: areaError } = await supabase.from('delivery_areas').select('customer_delivery_fee').eq('id', 1).single();
+        if (!areaError && areaData && feeInput) {
             feeInput.value = areaData.customer_delivery_fee || "";
         }
-
     } catch (error) {
-        console.error("Error fetching data:", error);
-        alert("Failed to load settings. Check console.");
+        console.error("Error fetching general settings:", error);
     }
 }
 
 // ==========================================
-// 3. HANDLE LOGO UPLOAD (BUCKET)
+// 3. GLOBAL SETTINGS SAVE LOGIC
 // ==========================================
-logoFileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        // Show preview instantly
-        logoPreview.src = URL.createObjectURL(file);
-        uploadLogoBtn.classList.remove('hidden'); // Show upload button
-    }
-});
+if (saveBtn) {
+    saveBtn.addEventListener('click', async () => {
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+        saveBtn.disabled = true;
 
-uploadLogoBtn.addEventListener('click', async () => {
-    const file = logoFileInput.files[0];
-    if (!file) return;
+        try {
+            // Update app_settings table
+            const { error: appError } = await supabase
+                .from('app_settings')
+                .update({
+                    rider_commission: commissionInput ? commissionInput.value : 0,
+                    delivery_timer: timerInput ? timerInput.value : 0,
+                    logo_url: currentLogoUrl
+                })
+                .eq('id', 1); 
 
-    uploadStatus.textContent = "Uploading...";
-    uploadStatus.classList.replace('text-gray-500', 'text-blue-500');
-    uploadLogoBtn.disabled = true;
+            if (appError) throw appError;
+
+            // Update Global Fee in delivery_areas
+            if (feeInput && feeInput.value) {
+                const { error: areaError } = await supabase
+                    .from('delivery_areas')
+                    .update({ customer_delivery_fee: feeInput.value })
+                    .eq('id', 1); 
+
+                if (areaError) throw areaError;
+            }
+
+            // Success state
+            saveBtn.innerHTML = `<i class="fas fa-check"></i> Saved`;
+            saveBtn.classList.replace('bg-[#0f172a]', 'bg-green-600');
+            
+            setTimeout(() => {
+                saveBtn.innerHTML = originalText;
+                saveBtn.classList.replace('bg-green-600', 'bg-[#0f172a]');
+                saveBtn.disabled = false;
+            }, 2000);
+
+        } catch (error) {
+            console.error("Save error:", error);
+            alert("Error saving global settings. Check console.");
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        }
+    });
+}
+
+// ==========================================
+// 4. 🌍 AREA MANAGEMENT (ON/OFF & TIMINGS)
+// ==========================================
+async function fetchAdminAreas() {
+    const listContainer = document.getElementById('adminAreasList');
+    if (!listContainer) return;
 
     try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `logo_${Date.now()}.${fileExt}`;
-
-        // Upload to 'branding' bucket
-        const { data, error } = await supabase.storage
-            .from('branding')
-            .upload(fileName, file, { cacheControl: '3600', upsert: false });
+        const { data, error } = await supabase
+            .from('delivery_areas')
+            .select('id, city, area_name, is_active, open_hour, close_hour')
+            .order('city', { ascending: true });
 
         if (error) throw error;
 
-        // Get Public URL
-        const { data: publicUrlData } = supabase.storage
-            .from('branding')
-            .getPublicUrl(fileName);
+        if (data && data.length > 0) {
+            listContainer.innerHTML = '';
+            
+            data.forEach(area => {
+                const areaCard = document.createElement('div');
+                areaCard.className = "bg-gray-50 border border-gray-200 p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:border-gray-300 shadow-sm";
+                
+                // Safe default checks
+                const safeOpenHour = area.open_hour !== null ? area.open_hour : 8;
+                const safeCloseHour = area.close_hour !== null ? area.close_hour : 1;
 
-        currentLogoUrl = publicUrlData.publicUrl;
-        
-        uploadStatus.textContent = "Uploaded successfully! Remember to Save Changes.";
-        uploadStatus.classList.replace('text-blue-500', 'text-green-600');
-        uploadLogoBtn.classList.add('hidden');
+                areaCard.innerHTML = `
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 text-md">${area.area_name} <span class="text-xs text-gray-500 font-normal">(${area.city})</span></h3>
+                        
+                        <div class="flex flex-wrap items-center gap-4 mt-3">
+                            <label class="flex items-center cursor-pointer">
+                                <span class="text-xs font-semibold mr-2 text-gray-600">Service:</span>
+                                <input type="checkbox" id="status_${area.id}" class="w-4 h-4 text-orange-600 rounded focus:ring-orange-500 border-gray-300" ${area.is_active ? 'checked' : ''}>
+                                <span class="text-xs ml-1 ${area.is_active ? 'text-green-600' : 'text-red-500'} font-bold" id="status_text_${area.id}">${area.is_active ? 'ON' : 'OFF'}</span>
+                            </label>
+                            
+                            <div class="flex items-center">
+                                <span class="text-xs font-semibold mr-1 text-gray-600">Open:</span>
+                                <input type="number" id="open_${area.id}" value="${safeOpenHour}" min="0" max="23" class="w-14 p-1 text-xs border border-gray-300 rounded text-center bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all">
+                                <span class="text-xs ml-1 text-gray-500">AM</span>
+                            </div>
 
-    } catch (error) {
-        console.error("Upload error:", error);
-        uploadStatus.textContent = "Upload failed.";
-        uploadStatus.classList.replace('text-blue-500', 'text-red-500');
-    } finally {
-        uploadLogoBtn.disabled = false;
+                            <div class="flex items-center">
+                                <span class="text-xs font-semibold mr-1 text-gray-600">Close:</span>
+                                <input type="number" id="close_${area.id}" value="${safeCloseHour}" min="0" max="23" class="w-14 p-1 text-xs border border-gray-300 rounded text-center bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all">
+                                <span class="text-xs ml-1 text-gray-500">AM</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="updateAreaSettings(${area.id})" id="btn_save_${area.id}" class="bg-[#0f172a] text-white text-xs font-medium px-5 py-2.5 rounded-lg hover:bg-[#1e293b] transition-all shadow-sm whitespace-nowrap min-w-[110px]">
+                        Save Area
+                    </button>
+                `;
+                listContainer.appendChild(areaCard);
+
+                // Live status text change logic
+                const statusInput = document.getElementById(`status_${area.id}`);
+                if(statusInput) {
+                    statusInput.addEventListener('change', function(e) {
+                        const txt = document.getElementById(`status_text_${area.id}`);
+                        if(e.target.checked) {
+                            txt.innerText = 'ON';
+                            txt.className = 'text-xs ml-1 text-green-600 font-bold';
+                        } else {
+                            txt.innerText = 'OFF';
+                            txt.className = 'text-xs ml-1 text-red-500 font-bold';
+                        }
+                    });
+                }
+            });
+        } else {
+            listContainer.innerHTML = `<div class="text-center text-gray-400 py-6 font-semibold text-sm">No delivery areas found in database.</div>`;
+        }
+    } catch (err) {
+        console.error("Admin Fetch Error:", err);
+        listContainer.innerHTML = `<div class="text-red-500 text-sm font-bold text-center py-6">Error loading areas. Check internet connection.</div>`;
     }
-});
+}
 
-// ==========================================
-// 4. SAVE ALL DATA TO SUPABASE
-// ==========================================
-saveBtn.addEventListener('click', async () => {
-    const originalText = saveBtn.innerHTML;
-    saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
-    saveBtn.disabled = true;
+// Update single area
+async function updateAreaSettings(areaId) {
+    const btn = document.getElementById(`btn_save_${areaId}`);
+    
+    const isActive = document.getElementById(`status_${areaId}`).checked;
+    let openHour = parseInt(document.getElementById(`open_${areaId}`).value);
+    let closeHour = parseInt(document.getElementById(`close_${areaId}`).value);
+
+    // Validation (Prevent empty or NaN inputs)
+    if (isNaN(openHour)) openHour = 8;
+    if (isNaN(closeHour)) closeHour = 1;
+
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Saving...`;
+    btn.disabled = true;
 
     try {
-        // Update app_settings table (Removed popup msg)
-        const { error: appError } = await supabase
-            .from('app_settings')
-            .update({
-                rider_commission: commissionInput.value,
-                delivery_timer: timerInput.value,
-                logo_url: currentLogoUrl
-            })
-            .eq('id', 1); // Replace 'id', 1 with your actual primary key setup
-
-        if (appError) throw appError;
-
-        // Update delivery_areas table
-        const { error: areaError } = await supabase
+        const { error } = await supabase
             .from('delivery_areas')
-            .update({
-                customer_delivery_fee: feeInput.value
+            .update({ 
+                is_active: isActive, 
+                open_hour: openHour, 
+                close_hour: closeHour 
             })
-            .eq('id', 1); // Replace 'id', 1 with your actual target area logic
+            .eq('id', areaId);
 
-        if (areaError) throw areaError;
+        if (error) throw error;
 
         // Success state
-        saveBtn.innerHTML = `<i class="fas fa-check"></i> Saved`;
-        saveBtn.classList.replace('bg-[#0f172a]', 'bg-green-600');
+        btn.innerHTML = `<i class="fas fa-check"></i> Saved`;
+        btn.classList.replace('bg-[#0f172a]', 'bg-green-600');
+        btn.classList.replace('hover:bg-[#1e293b]', 'hover:bg-green-700');
         
         setTimeout(() => {
-            saveBtn.innerHTML = originalText;
-            saveBtn.classList.replace('bg-green-600', 'bg-[#0f172a]');
-            saveBtn.disabled = false;
+            btn.innerHTML = originalText;
+            btn.classList.replace('bg-green-600', 'bg-[#0f172a]');
+            btn.classList.replace('hover:bg-green-700', 'hover:bg-[#1e293b]');
+            btn.disabled = false;
         }, 2000);
 
-    } catch (error) {
-        console.error("Save error:", error);
-        alert("Error saving settings. Check console.");
-        saveBtn.innerHTML = originalText;
-        saveBtn.disabled = false;
+    } catch (err) {
+        console.error("Area Update Error:", err);
+        alert("System Error: Area settings update nahi ho sakin. Dobara try karein.");
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     }
-});
+}
