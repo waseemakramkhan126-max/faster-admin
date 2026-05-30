@@ -15,89 +15,79 @@
         
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Settings</h1>
-            <p class="text-sm text-gray-500 mt-1">Manage your platform configurations and branding.</p>
+            <p class="text-sm text-gray-500 mt-1">Manage your platform configurations, branding, and delivery areas.</p>
         </div>
 
         <div class="flex border-b border-gray-200 mb-8 overflow-x-auto hide-scrollbar">
             <button class="px-1 py-4 text-sm font-medium text-blue-600 border-b-2 border-blue-600 whitespace-nowrap mr-8">General</button>
-            <button class="px-1 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap mr-8">Zones & Areas</button>
-            <button class="px-1 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap mr-8">Bot Prompts</button>
+            <button class="px-1 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap mr-8">Notifications</button>
+            <button class="px-1 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap">Theme</button>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-100">
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 md:p-8">
-                <div class="md:col-span-1">
-                    <h2 class="text-base font-semibold text-gray-900">Customer Delivery Fee</h2>
-                    <p class="text-sm text-gray-500 mt-1">Base delivery charges fetched from delivery areas.</p>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+            <div class="p-6 border-b border-gray-100 bg-gray-50/50">
+                <h2 class="text-lg font-bold text-gray-900">App Configurations</h2>
+            </div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Global Delivery Fee (Rs)</label>
+                    <input type="number" id="feeInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="150">
                 </div>
-                <div class="md:col-span-2 flex items-center">
-                    <div class="relative w-full max-w-md">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">Rs.</span>
-                        <input type="number" id="feeInput" class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all sm:text-sm" placeholder="Loading...">
-                    </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Rider Commission (%)</label>
+                    <input type="number" id="commissionInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="20">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Delivery Timer (Mins)</label>
+                    <input type="number" id="timerInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="45">
                 </div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 md:p-8">
-                <div class="md:col-span-1">
-                    <h2 class="text-base font-semibold text-gray-900">Rider Commission</h2>
-                    <p class="text-sm text-gray-500 mt-1">Amount paid to the rider per delivery.</p>
-                </div>
-                <div class="md:col-span-2 flex items-center">
-                    <div class="relative w-full max-w-md">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">Rs.</span>
-                        <input type="number" id="commissionInput" class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all sm:text-sm" placeholder="Loading...">
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 md:p-8">
-                <div class="md:col-span-1">
-                    <h2 class="text-base font-semibold text-gray-900">Delivery Target</h2>
-                    <p class="text-sm text-gray-500 mt-1">Estimated delivery time shown to customers.</p>
-                </div>
-                <div class="md:col-span-2 flex items-center">
-                    <div class="flex items-center w-full max-w-md">
-                        <input type="number" id="timerInput" class="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all sm:text-sm text-center" placeholder="--">
-                        <span class="ml-3 text-sm text-gray-600 font-medium">Minutes</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 md:p-8">
-                <div class="md:col-span-1">
-                    <h2 class="text-base font-semibold text-gray-900">Company Logo</h2>
-                    <p class="text-sm text-gray-500 mt-1">Used across the app and receipts. Upload to branding bucket.</p>
-                </div>
-                <div class="md:col-span-2 flex items-start gap-6">
-                    <div class="w-20 h-20 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
-                        <img id="logoPreview" src="https://via.placeholder.com/150?text=Logo" alt="Logo" class="w-full h-full object-contain">
-                    </div>
-                    
-                    <div class="flex flex-col gap-3 w-full max-w-sm">
-                        <input type="file" id="logoFileInput" accept="image/*" class="hidden">
-                        <div class="flex gap-2">
-                            <button onclick="document.getElementById('logoFileInput').click()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                                Choose File
-                            </button>
-                            <button id="uploadLogoBtn" class="px-4 py-2 bg-gray-100 text-gray-600 border border-transparent rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors hidden">
-                                Upload
-                            </button>
-                        </div>
-                        <p id="uploadStatus" class="text-xs text-gray-500">PNG, JPG up to 2MB</p>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
-        <div class="mt-6 flex justify-end gap-3">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+            <div class="p-6 border-b border-gray-100 bg-gray-50/50">
+                <h2 class="text-lg font-bold text-gray-900">App Branding</h2>
+            </div>
+            <div class="p-6 flex items-center gap-6">
+                <img id="logoPreview" src="https://via.placeholder.com/150" alt="App Logo" class="w-20 h-20 rounded-xl object-cover border border-gray-200">
+                <div>
+                    <input type="file" id="logoFileInput" accept="image/*" class="hidden">
+                    <div class="flex gap-2 mb-2">
+                        <button onclick="document.getElementById('logoFileInput').click()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            Choose File
+                        </button>
+                        <button id="uploadLogoBtn" class="px-4 py-2 bg-gray-100 text-gray-600 border border-transparent rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors hidden">
+                            Upload
+                        </button>
+                    </div>
+                    <p id="uploadStatus" class="text-xs text-gray-500">PNG, JPG up to 2MB</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+            <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">Delivery Areas Control</h2>
+                    <p class="text-sm text-gray-500 mt-1">Manage service status (ON/OFF) and specific timings for each area.</p>
+                </div>
+                <button onclick="fetchAdminAreas()" class="text-gray-500 hover:text-blue-600 transition" title="Refresh List">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="adminAreasList" class="space-y-4">
+                    <div class="text-center text-gray-400 py-6"><i class="fas fa-circle-notch fa-spin text-2xl mb-2"></i><br>Loading delivery areas...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-3 pb-10">
             <button id="resetBtn" class="px-5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                 Cancel
             </button>
             <button id="saveBtn" class="px-5 py-2.5 bg-[#0f172a] text-white rounded-lg text-sm font-medium hover:bg-[#1e293b] shadow-sm transition-all flex items-center gap-2">
-                <span>Save Changes</span>
+                <span>Save General Settings</span>
             </button>
         </div>
 
