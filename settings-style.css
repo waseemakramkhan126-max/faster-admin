@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body { 
+    font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+}
+
+/* Hide Scrollbar for Tabs but keep functionality */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Minimalist Clean Scrollbar for whole page */
+::-webkit-scrollbar { 
+    width: 6px; 
+    height: 6px; 
+}
+
+::-webkit-scrollbar-thumb { 
+    background: #cbd5e1; 
+    border-radius: 10px; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+}
+
+/* Fix for number inputs to remove arrows */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
