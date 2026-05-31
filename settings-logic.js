@@ -1,13 +1,16 @@
 // ==========================================
 // 1. Supabase Configuration & Safe Initialization
 // ==========================================
-const supabaseUrl = 'https://hkabhikizdlbavfkualt.supabase.co'; // <-- Apni actual URL yahan dalein
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U';    // <-- Apni actual Anon Key yahan dalein
-let supabase = null;
+const supabaseUrl = 'https://hkabhikizdlbavfkualt.supabase.co'; // <-- Apni actual URL
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U';    // <-- Apni actual Anon Key
+
+// 🛠️ FIX: Variable ka naam 'supabase' se badal kar 'supabaseClient' kar diya hai
+let supabaseClient = null;
 
 try {
     if (window.supabase) {
-        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // window.supabase library hai, us se createClient call kiya
+        supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
     } else {
         console.error("CRITICAL: Supabase CDN library load nahi hui!");
         alert("System Error: Supabase library nahi mili. Internet check karein ya HTML check karein.");
@@ -16,13 +19,13 @@ try {
     console.error("Supabase initialization crash:", initError);
 }
 
-// Poore DOM ke load hone ka intezar karein taake koi button 'null' na mile
+// Poore DOM ke load hone ka intezar karein
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Project Faster Settings DOM fully loaded.");
 
     const toastContainer = document.getElementById('toastContainer');
     
-    // Fail-safe Toast system (Agar toast container na bhi ho toh alert chalega)
+    // Fail-safe Toast system
     function showToast(message, type = 'success') {
         if (!toastContainer) {
             alert(`${type.toUpperCase()}: ${message}`);
@@ -63,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const file = event.target.files[0];
             if (!file) return;
 
-            if (!supabase) {
+            if (!supabaseClient) {
                 showToast("Storage Error: Supabase connected nahi hai.", "error");
                 return;
             }
@@ -75,13 +78,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fileExt = file.name.split('.').pop();
                 const fileName = `logo_${Date.now()}.${fileExt}`;
 
-                const { data, error } = await supabase.storage
+                // 🛠️ FIX: supabase ki jagah supabaseClient use kiya
+                const { data, error } = await supabaseClient.storage
                     .from('branding')
                     .upload(fileName, file, { upsert: true });
 
                 if (error) throw new Error(error.message);
 
-                const { data: publicUrlData } = supabase.storage
+                const { data: publicUrlData } = supabaseClient.storage
                     .from('branding')
                     .getPublicUrl(fileName);
                 
@@ -110,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         appSettingsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            if (!supabase) {
+            if (!supabaseClient) {
                 showToast("Database Error: Supabase client missing.", "error");
                 return;
             }
@@ -126,7 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                const { error } = await supabase
+                // 🛠️ FIX: supabase ki jagah supabaseClient use kiya
+                const { error } = await supabaseClient
                     .from('app_settings')
                     .upsert(settingsData);
 
@@ -153,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         deliveryAreaForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            if (!supabase) {
+            if (!supabaseClient) {
                 showToast("Database Error: Supabase client missing.", "error");
                 return;
             }
@@ -166,14 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const areaData = {
                 city: document.getElementById('city')?.value || '',
                 area_name: document.getElementById('areaName')?.value || '',
-                customer_delivery_fee: parseFloat(document.getElementById('deliveryFee')?.value) || 0,
+                custmer_delivery_fee: parseFloat(document.getElementById('deliveryFee')?.value) || 0,
                 is_active: document.getElementById('isActive')?.value === 'true',
                 open_hour: document.getElementById('openHour')?.value || '',
                 close_hour: document.getElementById('closeHour')?.value || ''
             };
 
             try {
-                const { error } = await supabase
+                // 🛠️ FIX: supabase ki jagah supabaseClient use kiya
+                const { error } = await supabaseClient
                     .from('delivery_areas')
                     .insert([areaData]);
 
@@ -197,9 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. Data Load Functions
     // ==========================================
     async function loadAppSettings() {
-        if (!supabase) return;
+        if (!supabaseClient) return;
         try {
-            const { data, error } = await supabase
+            // 🛠️ FIX: supabase ki jagah supabaseClient use kiya
+            const { data, error } = await supabaseClient
                 .from('app_settings')
                 .select('*')
                 .eq('id', 1)
@@ -221,9 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadDeliveryAreas() {
-        if (!supabase || !areasTableBody) return;
+        if (!supabaseClient || !areasTableBody) return;
         try {
-            const { data, error } = await supabase
+            // 🛠️ FIX: supabase ki jagah supabaseClient use kiya
+            const { data, error } = await supabaseClient
                 .from('delivery_areas')
                 .select('*')
                 .order('city', { ascending: true });
