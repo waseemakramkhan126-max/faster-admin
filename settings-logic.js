@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const areaData = {
                 city: document.getElementById('city')?.value || '',
                 area_name: document.getElementById('areaName')?.value || '',
-                custmer_delivery_fee: parseFloat(document.getElementById('deliveryFee')?.value) || 0,
+                customer_delivery_fee: parseFloat(document.getElementById('deliveryFee')?.value) || 0,
                 is_active: document.getElementById('isActive')?.value === 'true',
                 open_hour: document.getElementById('openHour')?.value || '',
                 close_hour: document.getElementById('closeHour')?.value || ''
