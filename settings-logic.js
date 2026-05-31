@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tr.innerHTML = `
                     <td>${area.city || '-'}</td>
                     <td>${area.area_name || '-'}</td>
-                    <td>Rs. ${area.custmer_delivery_fee || 0}</td>
+                    <td>Rs. ${area.customer_delivery_fee || 0}</td>
                     <td>${area.open_hour || '-'} - ${area.close_hour || '-'}</td>
                     <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 `;
