@@ -3,34 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faster Admin | Settings</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Admin Settings - Project Faster</title>
     <link rel="stylesheet" href="settings-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-50 min-h-screen text-gray-800">
-    <main class="max-w-5xl mx-auto p-6 md:p-10">
-        <h1 class="text-3xl font-bold mb-8">Settings</h1>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <h2 class="brand-title">Admin Panel</h2>
+            <nav>
+                <a href="#" class="active">Settings</a>
+                <a href="#">Orders</a>
+                <a href="#">Riders</a>
+            </nav>
+        </aside>
 
-        <div class="bg-white p-6 rounded-2xl border mb-8">
-            <h2 class="text-lg font-bold mb-4">App Configurations</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <input type="number" id="feeInput" placeholder="Delivery Fee" class="p-2 border rounded-lg w-full">
-                <input type="number" id="commissionInput" placeholder="Commission %" class="p-2 border rounded-lg w-full">
-                <input type="number" id="timerInput" placeholder="Timer Mins" class="p-2 border rounded-lg w-full">
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Platform Settings</h1>
+                <p>App ki basic configurations aur delivery areas manage karein.</p>
+            </header>
+
+            <div class="settings-grid">
+                <section class="card">
+                    <div class="card-header">
+                        <h3>App Configurations</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="appSettingsForm">
+                            <div class="form-group">
+                                <label for="logoUpload">App Logo (Branding)</label>
+                                <div class="upload-wrapper">
+                                    <img id="logoPreview" src="https://via.placeholder.com/150x50?text=No+Logo" alt="Logo Preview" class="logo-preview">
+                                    <input type="file" id="logoUpload" accept="image/*">
+                                    <button type="button" id="uploadLogoBtn" class="btn btn-secondary">Upload Logo</button>
+                                </div>
+                                <input type="hidden" id="logoUrlHidden">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="riderCommission">Rider Commission (%)</label>
+                                <input type="number" id="riderCommission" step="0.01" placeholder="e.g. 15">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="deliveryTimer">Delivery Timer (Minutes)</label>
+                                <input type="number" id="deliveryTimer" placeholder="e.g. 45">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="saveAppBtn">Save App Settings</button>
+                        </form>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h3>Add Delivery Area</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="deliveryAreaForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="city">City</label>
+                                    <input type="text" id="city" placeholder="e.g. Lahore" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="areaName">Area Name</label>
+                                    <input type="text" id="areaName" placeholder="e.g. Bahria Town" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="deliveryFee">Customer Delivery Fee (Rs)</label>
+                                    <input type="number" id="deliveryFee" required>
+                                </div>
+                                <div class="form-group toggle-group">
+                                    <label for="isActive">Is Active?</label>
+                                    <select id="isActive">
+                                        <option value="true">Active (True)</option>
+                                        <option value="false">Inactive (False)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="openHour">Open Hour</label>
+                                    <input type="time" id="openHour" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="closeHour">Close Hour</label>
+                                    <input type="time" id="closeHour" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Add / Save Area</button>
+                        </form>
+                    </div>
+                </section>
             </div>
-        </div>
 
-        <div class="bg-white p-6 rounded-2xl border mb-8">
-            <h2 class="text-lg font-bold mb-4">Delivery Areas Control</h2>
-            <div id="adminAreasList" class="space-y-4">
-                <div class="text-gray-400">Loading areas...</div>
-            </div>
-        </div>
+            <section class="card full-width">
+                <div class="card-header">
+                    <h3>Active Delivery Areas</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>City</th>
+                                    <th>Area</th>
+                                    <th>Fee</th>
+                                    <th>Timing</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="areasTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
-        <button id="saveBtn" class="bg-black text-white px-6 py-3 rounded-lg">Save All Settings</button>
-    </main>
     <script src="settings-logic.js"></script>
 </body>
 </html>
