@@ -4,36 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Settings - Project Faster</title>
+    
+    <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="settings-style.css">
+    
+    <!-- Supabase CDN Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- FontAwesome CDN (Icons ke liye zaroori hai, jaise 3-line/hamburger icon) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+
+    <!-- MAIN ADMIN LAYOUT WRAPPER -->
     <div class="admin-layout">
+
+        <!-- =======================================================================
+             1. MOBILE TOP BAR (Yeh sirf mobile view me show hoga)
+             Agar mobile screen par koi aur button ya title badalna ho to yahan badlein
+             ======================================================================= -->
+        <div class="mobile-header">
+            <span class="font-bold" style="font-weight: 600;">Admin Panel</span>
+            <button class="menu-toggle-btn" id="menuToggleBtn">
+                <i class="fas fa-bars"></i> Menu
+            </button>
+        </div>
+
+
+        <!-- =======================================================================
+             2. SIDEBAR NAVIGATION
+             Agar dashboard par koi naya link/button add karna hai to niche comment ke paas karein
+             ======================================================================= -->
         <aside class="sidebar">
+            <!-- Panel Ka Main Name -->
             <h2 class="brand-title">Admin Panel</h2>
+            
             <nav>
-                <a href="#" class="active">Settings</a>
-                <a href="#">Orders</a>
-                <a href="#">Riders</a>
+                <!-- Active page link -->
+                <a href="#" class="active"><i class="fas fa-cog"></i> Settings</a>
+                
+                <!-- 
+                  FUTURE BUTTONS / NAVIGATION EXTENSION:
+                  Agar aapko Orders, Riders ya koi aur naya page add karna ho, 
+                  to niche wali lines ko un-comment (remove <!-- and -->) kar dein:
+                  
+                  <a href="orders.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+                  <a href="riders.html"><i class="fas fa-motorcycle"></i> Riders</a>
+                  <a href="users.html"><i class="fas fa-users"></i> Users</a>
+                -->
             </nav>
         </aside>
 
+
+        <!-- =======================================================================
+             3. MAIN CONTENT AREA (Saara data, forms aur tables yahan hain)
+             ======================================================================= -->
         <main class="main-content">
-            <button id="toggleSidebarBtn" class="btn btn-secondary mobile-menu-btn" style="display: none; margin-bottom: 16px;">
-                  <i class="fas fa-bars"></i> Menu
-            </button>
+            
+            <!-- Page Header (Title aur Description) -->
             <header class="page-header">
                 <h1>Platform Settings</h1>
                 <p>App ki basic configurations aur delivery areas manage karein.</p>
             </header>
 
+            <!-- SETTINGS GRID: Forms ko manage karne ke liye layout -->
             <div class="settings-grid">
+                
+                <!-- ==========================================
+                     CARD A: APP CONFIGURATIONS (Logo, Commission etc)
+                     ========================================== -->
                 <section class="card">
                     <div class="card-header">
                         <h3>App Configurations</h3>
                     </div>
                     <div class="card-body">
                         <form id="appSettingsForm">
+                            
+                            <!-- Logo Upload Input Field -->
                             <div class="form-group">
                                 <label for="logoUpload">App Logo (Branding)</label>
                                 <div class="upload-wrapper">
@@ -41,30 +88,39 @@
                                     <input type="file" id="logoUpload" accept="image/*">
                                     <button type="button" id="uploadLogoBtn" class="btn btn-secondary">Upload Logo</button>
                                 </div>
+                                <!-- Hidden input URL pass karne ke liye -->
                                 <input type="hidden" id="logoUrlHidden">
                             </div>
 
+                            <!-- Rider Commission Input -->
                             <div class="form-group">
                                 <label for="riderCommission">Rider Commission (%)</label>
                                 <input type="number" id="riderCommission" step="0.01" placeholder="e.g. 15">
                             </div>
 
+                            <!-- Delivery Timer Input -->
                             <div class="form-group">
                                 <label for="deliveryTimer">Delivery Timer (Minutes)</label>
                                 <input type="number" id="deliveryTimer" placeholder="e.g. 45">
                             </div>
 
+                            <!-- Form Submit Button -->
                             <button type="submit" class="btn btn-primary" id="saveAppBtn">Save App Settings</button>
                         </form>
                     </div>
                 </section>
 
+                <!-- ==========================================
+                     CARD B: ADD DELIVERY AREA FORM
+                     ========================================== -->
                 <section class="card">
                     <div class="card-header">
                         <h3>Add Delivery Area</h3>
                     </div>
                     <div class="card-body">
                         <form id="deliveryAreaForm">
+                            
+                            <!-- Row 1: City & Area Names -->
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="city">City</label>
@@ -76,6 +132,7 @@
                                 </div>
                             </div>
 
+                            <!-- Row 2: Delivery Fee & Status Toggle -->
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="deliveryFee">Customer Delivery Fee (Rs)</label>
@@ -90,6 +147,7 @@
                                 </div>
                             </div>
 
+                            <!-- Row 3: Operational Timings -->
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="openHour">Open Hour</label>
@@ -101,31 +159,36 @@
                                 </div>
                             </div>
 
+                            <!-- Area Save Button -->
                             <button type="submit" class="btn btn-primary">Add / Save Area</button>
                         </form>
                     </div>
                 </section>
             </div>
 
+            <!-- ==========================================
+                 CARD C: ACTIVE DELIVERY AREAS DATA TABLE
+                 ========================================== -->
             <section class="card full-width">
                 <div class="card-header">
                     <h3>Active Delivery Areas</h3>
                 </div>
                 <div class="card-body">
+                    <!-- Responsive Wrapper for Mobile Tables -->
                     <div class="table-responsive">
                         <table class="data-table">
                             <thead>
-    <tr>
-        <th>City</th>
-        <th>Area</th>
-        <th>Fee</th>
-        <th>Timing</th>
-        <th>Status</th>
-        <th>Actions</th>
-    </tr>
+                                <tr>
+                                    <th>City</th>
+                                    <th>Area</th>
+                                    <th>Fee</th>
+                                    <th>Timing</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
                             </thead>
-                            <tbody id="areasTableBody">
-                                </tbody>
+                            <!-- Supabase se aane wala data dynamic roop se is body me load hoga -->
+                            <tbody id="areasTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -133,8 +196,27 @@
         </main>
     </div>
 
+    <!-- TOAST NOTIFICATION CONTAINER: Success ya Error popups yahan trigger hote hain -->
     <div id="toastContainer" class="toast-container"></div>
     
+    <!-- ==========================================
+         JAVASCRIPT LOGIC SCRIPTS
+         ========================================== -->
+    <!-- External Business Logic Script -->
     <script src="settings-logic.js"></script>
+
+    <!-- Mobile Navigation Menu Toggle Engine -->
+    <script>
+        // Hamburger (3-line) button engine code
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const sidebarMenu = document.querySelector('.sidebar');
+
+        if (menuToggleBtn && sidebarMenu) {
+            menuToggleBtn.addEventListener('click', () => {
+                // Sidebar me 'show' class apply ya remove karega jisse display handles ho skein
+                sidebarMenu.classList.toggle('show');
+            });
+        }
+    </script>
 </body>
 </html>
