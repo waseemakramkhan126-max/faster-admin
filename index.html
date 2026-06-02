@@ -59,7 +59,7 @@
         }
 
         // ==========================================
-        // 2. Form Submit Handling & Authentication
+        // 2. Custom Table Authentication (Without Supabase Auth)
         // ==========================================
         document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -73,38 +73,35 @@
             const password = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
 
-            // Button State Changing
             btn.innerText = "VERIFYING...";
             btn.disabled = true;
 
             try {
-                // Supabase Auth call for actual authentication
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
+                // Direct custom table se check kar rahe hain
+                const { data, error } = await supabaseClient
+                    .from('admin_profile')
+                    .select('*')
+                    .eq('gmail', email)
+                    .eq('password', password)
+                    .single();
 
-                if (error) {
-                    throw error;
+                if (error || !data) {
+                    throw new Error("Invalid Email or Password");
                 }
 
-                // Agar login successful ho jaye
-                if (data.user) {
-                    localStorage.setItem('isAdminLoggedIn', 'true');
-                    localStorage.setItem('adminSessionStart', Date.now());
-                    
-                    btn.innerText = "ACCESS GRANTED...";
-                    btn.className = "w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-xl";
-                    
-                    setTimeout(() => {
-                        // Aapko dashboard par redirect kar dega
-                        location.href = 'dashboard.html';
-                    }, 1000);
-                }
+                // Agar data match ho gaya (Login Successful)
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                localStorage.setItem('adminSessionStart', Date.now());
+                
+                btn.innerText = "ACCESS GRANTED...";
+                btn.className = "w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-xl";
+                
+                setTimeout(() => {
+                    location.href = 'dashboard.html';
+                }, 1000);
 
             } catch (err) {
                 alert(`Authentication Failed: ${err.message} ❌`);
-                // Reset Button
                 btn.innerText = "SECURE LOGIN";
                 btn.disabled = false;
                 document.getElementById('adminPassword').value = '';
