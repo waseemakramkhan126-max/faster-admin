@@ -361,6 +361,11 @@ input[type="file"] {
     border-left-color: var(--success-color);
 }
 
+/* PC par toggle button hide rahega */
+.mobile-header {
+    display: none;
+}
+
 /* ==========================================
    MOBILE & TABLET FRIENDLY RESPONSIVE DESIGN (Media Queries)
    ========================================== */
@@ -369,30 +374,62 @@ input[type="file"] {
         flex-direction: column; /* PC Layout ko vertical stack kiya */
     }
 
+    /* Mobile ke liye ek top bar jahan 3-line icon dikhega */
+    .mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background-color: var(--sidebar-bg);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .menu-toggle-btn {
+        background: none;
+        border: 1px solid var(--border-color);
+        padding: 6px 12px;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-main);
+    }
+    /* Hover karne par button green ho jayega */
+    .menu-toggle-btn:hover {
+        background-color: #dafbe1;
+        color: var(--primary-hover);
+        border-color: rgba(31, 136, 61, 0.3);
+    }
+
+    /* Mobile par sidebar BY DEFAULT HIDE rahega */
     .sidebar {
+        display: none; 
         width: 100%;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
         padding: 16px;
     }
 
+    /* Jab JavaScript 'show' class add karega, to sidebar dikhega */
+    .sidebar.show {
+        display: block;
+    }
+
     .brand-title {
-        margin-bottom: 16px;
-        justify-content: center;
+        margin-bottom: 0; /* Mobile header me adjust kiya */
         padding-left: 0;
     }
 
     .sidebar nav {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-direction: column; /* Menu items upar se neeche aayenge */
         gap: 6px;
+        margin-top: 12px;
     }
 
     .sidebar nav a {
         margin-bottom: 0;
-        padding: 6px 12px;
-        font-size: 0.85rem;
+        padding: 8px 16px;
+        font-size: 0.9rem;
     }
 
     .main-content {
@@ -404,12 +441,12 @@ input[type="file"] {
     }
 
     .settings-grid {
-        grid-template-columns: 1fr; /* Mobile par har card block poori width lega */
+        grid-template-columns: 1fr;
         gap: 16px;
     }
 
     .form-row {
-        flex-direction: column; /* Inputs row mobile par upar-niche ho jayengi */
+        flex-direction: column;
         gap: 0;
     }
     
