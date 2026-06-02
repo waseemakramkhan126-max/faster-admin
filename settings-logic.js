@@ -106,89 +106,70 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // LOGO UPLOAD
+    // LOGO UPLOAD (With Immediate DB Save)
     // ==========================================
     if (uploadLogoBtn && logoUploadInput) {
 
         uploadLogoBtn.addEventListener('click', (e) => {
-
             e.preventDefault();
-
             logoUploadInput.click();
         });
 
-        logoUploadInput.addEventListener(
-            'change',
-            async (event) => {
+        logoUploadInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
 
-                const file = event.target.files[0];
-
-                if (!file) return;
-
-                if (!supabaseClient) {
-                    showToast(
-                        "Supabase connect nahi hai.",
-                        "error"
-                    );
-                    return;
-                }
-
-                uploadLogoBtn.textContent =
-                    "Uploading...";
-
-                uploadLogoBtn.disabled = true;
-
-                try {
-
-                    const fileExt =
-                        file.name.split('.').pop();
-
-                    const fileName =
-                        `logo_${Date.now()}.${fileExt}`;
-
-                    const { error } =
-                        await supabaseClient.storage
-                            .from('branding')
-                            .upload(fileName, file, {
-                                upsert: true
-                            });
-
-                    if (error) {
-                        throw new Error(error.message);
-                    }
-
-                    const { data: publicUrlData } =
-                        supabaseClient.storage
-                            .from('branding')
-                            .getPublicUrl(fileName);
-
-                    logoPreview.src =
-                        publicUrlData.publicUrl;
-
-                    logoUrlHidden.value =
-                        publicUrlData.publicUrl;
-
-                    showToast(
-                        "Logo upload ho gaya!",
-                        "success"
-                    );
-
-                } catch (error) {
-
-                    showToast(
-                        error.message,
-                        "error"
-                    );
-
-                } finally {
-
-                    uploadLogoBtn.textContent =
-                        "Upload Logo";
-
-                    uploadLogoBtn.disabled = false;
-                }
+            if (!supabaseClient) {
+                showToast("Supabase connect nahi hai.", "error");
+                return;
             }
-        );
+
+            uploadLogoBtn.textContent = "Uploading...";
+            uploadLogoBtn.disabled = true;
+
+            try {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `logo_${Date.now()}.${fileExt}`;
+
+                // 1. Storage me file upload karein
+                const { error: storageError } = await supabaseClient.storage
+                    .from('branding')
+                    .upload(fileName, file, { upsert: true });
+
+                if (storageError) {
+                    throw new Error(storageError.message);
+                }
+
+                // 2. Public URL hasil karein
+                const { data: publicUrlData } = supabaseClient.storage
+                    .from('branding')
+                    .getPublicUrl(fileName);
+
+                // UI update karein
+                logoPreview.src = publicUrlData.publicUrl;
+                logoUrlHidden.value = publicUrlData.publicUrl;
+
+                // 3. (CRUCIAL FIX) URL ko turant database ke app_settings me save/upsert karein
+                const { error: dbError } = await supabaseClient
+                    .from('app_settings')
+                    .upsert({ 
+                        id: 1, 
+                        logo_url: publicUrlData.publicUrl 
+                    });
+
+                if (dbError) {
+                    throw new Error("Storage me save hua par DB me nahi: " + dbError.message);
+                }
+
+                showToast("Logo upload aur DB me save ho gaya! 🎉", "success");
+
+            } catch (error) {
+                showToast(error.message, "error");
+            } finally {
+                uploadLogoBtn.textContent = "Upload Logo";
+                uploadLogoBtn.disabled = false;
+            }
+        });
     }
 
     // ==========================================
@@ -196,73 +177,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     if (appSettingsForm) {
 
-        appSettingsForm.addEventListener(
-            'submit',
-            async (e) => {
+        appSettingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-                e.preventDefault();
-
-                if (!supabaseClient) {
-                    showToast(
-                        "Supabase missing.",
-                        "error"
-                    );
-                    return;
-                }
-
-                saveAppBtn.textContent =
-                    "Saving...";
-
-                saveAppBtn.disabled = true;
-
-                const settingsData = {
-                    id: 1,
-                    rider_commission:
-                        parseFloat(
-                            riderCommissionInput.value
-                        ) || 0,
-
-                    delivery_timer:
-                        parseInt(
-                            deliveryTimerInput.value
-                        ) || 0,
-
-                    logo_url:
-                        logoUrlHidden.value || ''
-                };
-
-                try {
-
-                    const { error } =
-                        await supabaseClient
-                            .from('app_settings')
-                            .upsert(settingsData);
-
-                    if (error) {
-                        throw new Error(error.message);
-                    }
-
-                    showToast(
-                        "Settings save ho gayin!",
-                        "success"
-                    );
-
-                } catch (error) {
-
-                    showToast(
-                        error.message,
-                        "error"
-                    );
-
-                } finally {
-
-                    saveAppBtn.textContent =
-                        "Save App Settings";
-
-                    saveAppBtn.disabled = false;
-                }
+            if (!supabaseClient) {
+                showToast("Supabase missing.", "error");
+                return;
             }
-        );
+
+            saveAppBtn.textContent = "Saving...";
+            saveAppBtn.disabled = true;
+
+            const settingsData = {
+                id: 1,
+                rider_commission: parseFloat(riderCommissionInput.value) || 0,
+                delivery_timer: parseInt(deliveryTimerInput.value) || 0,
+                logo_url: logoUrlHidden.value || ''
+            };
+
+            try {
+                const { error } = await supabaseClient
+                    .from('app_settings')
+                    .upsert(settingsData);
+
+                if (error) {
+                    throw new Error(error.message);
+                }
+
+                showToast("Settings save ho gayin!", "success");
+
+            } catch (error) {
+                showToast(error.message, "error");
+            } finally {
+                saveAppBtn.textContent = "Save App Settings";
+                saveAppBtn.disabled = false;
+            }
+        });
     }
 
     // ==========================================
