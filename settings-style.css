@@ -492,6 +492,8 @@ input[type="file"] {
     }
 }
 
+/* ... (Aapka oopar wala saara code yahan rahega) ... */
+
 /* =======================================================================
    NATIVE PICKER INTERFACES SAFE OVERRIDES
    ======================================================================= */
@@ -514,4 +516,16 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     transform: translateY(-50%);
     width: 20px;
     height: 20px;
+}
+
+/* 👇 YAHAN SE NAYA CODE ADD KAREIN 👇 */
+
+.card:has(input[type="time"]) .card-body {
+    padding-right: 24px !important; 
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+    margin-right: 4px;
 }
