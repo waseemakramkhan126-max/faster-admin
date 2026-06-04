@@ -59,7 +59,7 @@
         }
 
         // ==========================================
-        // 2. Custom Table Authentication (Without Supabase Auth)
+        // 2. Custom RPC Authentication (Highly Secure)
         // ==========================================
         document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -77,24 +77,29 @@
             btn.disabled = true;
 
             try {
-                // Direct custom table se check kar rahe hain
+                // 👇 YAHAN CHANGES KI GAYI HAIN 👇
+                // Ab direct table parhne ke bajaye, hum secure RPC function call kar rahe hain
                 const { data, error } = await supabaseClient
-                    .from('admin_profile')
-                    .select('*')
-                    .eq('gmail', email)
-                    .eq('password', password)
-                    .single();
+                    .rpc('secure_admin_login', {
+                        p_gmail: email,
+                        p_password: password
+                    });
 
-                if (error || !data) {
+                // Agar query mein error aaya, ya data array empty return hua (Invalid credentials)
+                if (error || !data || data.length === 0) {
                     throw new Error("Invalid Email or Password");
                 }
 
-                // Agar data match ho gaya (Login Successful)
+                // Login Successful! Data ka pehla record nikal lein
+                const adminUser = data[0]; 
+
+                // System mein login status aur admin ki detail save karein
                 localStorage.setItem('isAdminLoggedIn', 'true');
                 localStorage.setItem('adminSessionStart', Date.now());
+                localStorage.setItem('adminName', adminUser.name); // Dashboard ke liye naam bhi save kar diya
                 
                 btn.innerText = "ACCESS GRANTED...";
-                btn.className = "w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-xl";
+                btn.className = "w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-xl transition-all";
                 
                 setTimeout(() => {
                     location.href = 'dashboard.html';
@@ -103,6 +108,7 @@
             } catch (err) {
                 alert(`Authentication Failed: ${err.message} ❌`);
                 btn.innerText = "SECURE LOGIN";
+                btn.className = "w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all";
                 btn.disabled = false;
                 document.getElementById('adminPassword').value = '';
             }
