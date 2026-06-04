@@ -11,59 +11,105 @@
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f8fafc; /* Minimalist light gray background */
+            background-color: #f8fafc; 
             color: #334155; 
             overflow: hidden; 
         }
 
-        /* SIDEBAR MAGIC (Logic kept intact, flat styling) */
-        .sidebar {
-            width: 80px; 
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* RESPONSIVE SIDEBAR MAGIC */
+        /* PC View */
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 80px; 
+                transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .sidebar:hover {
+                width: 260px; 
+            }
+            .nav-text {
+                opacity: 0;
+                transform: translateX(-10px);
+                transition: all 0.3s ease;
+                white-space: nowrap;
+            }
+            .sidebar:hover .nav-text {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
-        .sidebar:hover {
-            width: 260px; 
+        
+        /* Mobile View */
+        @media (max-width: 767px) {
+            .sidebar {
+                width: 260px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                z-index: 50;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .nav-text {
+                opacity: 1; /* Mobile pe text hamesha dikhega */
+                transform: translateX(0);
+                white-space: nowrap;
+            }
         }
-        .nav-text {
+
+        /* Mobile Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 40;
             opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.3s ease;
-            white-space: nowrap;
+            transition: opacity 0.3s ease;
         }
-        .sidebar:hover .nav-text {
+        .overlay.show {
+            display: block;
             opacity: 1;
-            transform: translateX(0);
         }
     </style>
 </head>
-<body class="flex h-screen w-full">
+<body class="flex h-screen w-full relative">
 
-    <aside class="sidebar bg-white border-r border-gray-200 h-full flex flex-col z-50 relative group shadow-sm">
+    <div id="mobileOverlay" class="overlay md:hidden"></div>
+
+    <aside id="sidebar" class="sidebar bg-white border-r border-gray-200 h-full flex flex-col group shadow-sm shrink-0">
         
-        <div class="h-16 flex items-center px-6 border-b border-gray-200 shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200 shrink-0 relative">
             <div class="w-8 h-8 rounded-md bg-slate-800 flex items-center justify-center shrink-0">
                 <i class="fas fa-bolt text-white text-sm"></i>
             </div>
             <h1 class="nav-text text-base font-bold text-slate-800 tracking-wide ml-4">Faster<span class="text-emerald-600 font-black">Admin</span></h1>
+            
+            <button id="closeSidebarBtn" class="md:hidden absolute right-4 text-slate-400 hover:text-slate-800">
+                <i class="fas fa-times text-xl"></i>
+            </button>
         </div>
 
         <nav class="flex-1 overflow-y-auto py-6 space-y-1 overflow-x-hidden">
             
             <a href="dashboard.html" class="nav-item flex items-center px-6 py-3 text-emerald-700 bg-emerald-50 border-r-4 border-emerald-600">
-                <i class="nav-icon fas fa-chart-pie w-8 text-center text-lg"></i>
+                <i class="nav-icon fas fa-chart-pie w-8 text-center text-lg shrink-0"></i>
                 <span class="nav-text font-semibold text-sm tracking-wide ml-4">Dashboard</span>
             </a>
 
             <a href="promo-dashboard.html" class="nav-item flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors border-r-4 border-transparent hover:border-slate-300">
-                <i class="nav-icon fas fa-ad w-8 text-center text-lg"></i>
+                <i class="nav-icon fas fa-ad w-8 text-center text-lg shrink-0"></i>
                 <span class="nav-text font-medium text-sm tracking-wide ml-4 flex items-center justify-between w-full">
                     Promotions
-                    <span class="bg-emerald-100 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-full ml-4">READY</span>
+                    <span class="bg-emerald-100 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-full ml-2">READY</span>
                 </span>
             </a>
 
             <a href="settings.html" class="nav-item flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors border-r-4 border-transparent hover:border-slate-300">
-                <i class="nav-icon fas fa-cogs w-8 text-center text-lg"></i>
+                <i class="nav-icon fas fa-cogs w-8 text-center text-lg shrink-0"></i>
                 <span class="nav-text font-medium text-sm tracking-wide ml-4">Settings</span>
             </a>
 
@@ -71,36 +117,40 @@
 
         <div class="p-4 border-t border-gray-200">
             <a href="#" class="nav-item flex items-center px-2 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors">
-                <i class="fas fa-sign-out-alt w-8 text-center text-base"></i>
+                <i class="fas fa-sign-out-alt w-8 text-center text-base shrink-0"></i>
                 <span class="nav-text font-semibold text-sm tracking-wide ml-4">Log Out</span>
             </a>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full relative bg-slate-50/50">
+    <main class="flex-1 flex flex-col h-full min-w-0 relative bg-slate-50/50">
         
-        <header class="h-16 px-8 flex justify-between items-center border-b border-gray-200 bg-white">
-            <div>
-                <h2 class="text-slate-800 font-bold text-lg tracking-wide">System Hub</h2>
+        <header class="h-16 px-4 md:px-8 flex justify-between items-center border-b border-gray-200 bg-white shrink-0">
+            <div class="flex items-center gap-3">
+                <button id="openMobileMenu" class="md:hidden text-slate-600 hover:text-emerald-600 focus:outline-none bg-slate-100 p-2 rounded-md">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <h2 class="text-slate-800 font-bold text-base md:text-lg tracking-wide">System Hub</h2>
             </div>
-            <div class="flex items-center gap-6">
-                <div class="text-right border-r border-gray-200 pr-6">
-                    <p class="text-sm font-bold text-slate-800" id="liveTime">00:00:00</p>
-                    <p class="text-[10px] text-emerald-600 font-semibold uppercase tracking-wider">Live Connect</p>
+
+            <div class="flex items-center gap-3 md:gap-6">
+                <div class="text-right border-r border-gray-200 pr-3 md:pr-6">
+                    <p class="text-xs md:text-sm font-bold text-slate-800" id="liveTime">00:00:00</p>
+                    <p class="text-[9px] md:text-[10px] text-emerald-600 font-semibold uppercase tracking-wider">Live Connect</p>
                 </div>
-                <div class="flex items-center gap-3 px-3 py-1.5 rounded-md hover:bg-slate-100 cursor-pointer transition-colors border border-transparent">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <span class="text-sm font-semibold text-slate-700">Waseem Akram</span>
+                <div class="flex items-center gap-2 md:gap-3 px-2 md:px-3 py-1.5 rounded-md hover:bg-slate-100 cursor-pointer transition-colors border border-transparent">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></div>
+                    <span class="text-xs md:text-sm font-semibold text-slate-700 hidden sm:block">Waseem Akram</span>
                 </div>
             </div>
             <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         </header>
 
-        <div id="mainDashboardArea" class="flex-1 p-8 overflow-y-auto">
+        <div id="mainDashboardArea" class="flex-1 p-4 md:p-8 overflow-y-auto">
             
-            <div class="flex flex-wrap gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                 
-                <a href="order-management.html" class="w-[240px] bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
+                <a href="order-management.html" class="w-full bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
                     <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors">
                         <i class="fas fa-clipboard-list text-indigo-500 group-hover:text-emerald-600 text-lg transition-colors"></i>
                     </div>
@@ -110,8 +160,8 @@
                     </p>
                 </a>
 
-                <a href="admin-topups.html" class="relative w-[240px] bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
-                    <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors relative">
+                <a href="admin-topups.html" class="relative w-full bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors relative inline-flex">
                         <i class="fas fa-wallet text-blue-500 group-hover:text-emerald-600 text-lg transition-colors"></i>
                         
                         <span id="topupBadge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">
@@ -124,8 +174,8 @@
                     </p>
                 </a>
 
-                <a href="withdraw-requests.html" class="relative w-[240px] bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
-                    <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors relative">
+                <a href="withdraw-requests.html" class="relative w-full bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors relative inline-flex">
                         <i class="fas fa-arrow-up text-orange-500 group-hover:text-emerald-600 text-lg transition-colors"></i>
                         
                         <span id="withdrawBadge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">
@@ -138,13 +188,9 @@
                     </p>
                 </a>
 
-                <a href="wallets-control.html" class="relative w-[240px] bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
-                    <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors relative">
+                <a href="wallets-control.html" class="relative w-full bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors relative inline-flex">
                         <i class="fas fa-chart-line text-purple-500 group-hover:text-emerald-600 text-lg transition-colors"></i>
-                        
-                        <span id="topupBadge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">
-                            0
-                        </span>
                     </div>
                     <h3 class="text-slate-800 font-bold text-sm tracking-wide">Financial Details</h3>
                     <p class="text-xs text-slate-500 mt-1 leading-relaxed">
@@ -153,10 +199,24 @@
                 </a>
 
             </div>
-
         </div>
-
     </main>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        const openBtn = document.getElementById('openMobileMenu');
+        const closeBtn = document.getElementById('closeSidebarBtn');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        openBtn.addEventListener('click', toggleSidebar);
+        closeBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+    </script>
 
     <script>
         // Live Clock with Seconds
@@ -182,7 +242,6 @@
         // 2. Fetch Pending Count
         async function fetchPendingTopupsCount() {
             try {
-                // Sirf pending requests ki ginti (count) mangwa rahe hain speed ke liye
                 const { count, error } = await _supabase
                     .from('topup_requests')
                     .select('*', { count: 'exact', head: true })
@@ -192,67 +251,64 @@
                 
                 const badge = document.getElementById('topupBadge');
                 if (count > 0) {
-                    badge.innerText = count > 99 ? '99+' : count; // 99 se zyada ho to 99+ dikhaye
-                    badge.classList.remove('hidden'); // Badge show karein
+                    badge.innerText = count > 99 ? '99+' : count; 
+                    badge.classList.remove('hidden'); 
                 } else {
-                    badge.classList.add('hidden'); // Agar 0 ho to chupa dein
+                    badge.classList.add('hidden'); 
                 }
             } catch (err) {
                 console.error("Error fetching topup count:", err);
             }
         }
 
-        // 1. WITHDRAW BADGE COUNT & REALTIME (Naya Code)
-async function updateWithdrawBadgeCount() {
-    try {
-        const { count, error } = await _supabase
-            .from('withdraw_requests')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'pending');
+        // 1. WITHDRAW BADGE COUNT & REALTIME
+        async function updateWithdrawBadgeCount() {
+            try {
+                const { count, error } = await _supabase
+                    .from('withdraw_requests')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'pending');
 
-        const badge = document.getElementById('withdrawBadge');
-        if (badge) {
-            if (!error && count > 0) {
-                badge.innerText = count;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
+                const badge = document.getElementById('withdrawBadge');
+                if (badge) {
+                    if (!error && count > 0) {
+                        badge.innerText = count;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            } catch (err) {
+                console.error("Withdraw badge error: ", err);
             }
         }
-    } catch (err) {
-        console.error("Withdraw badge error: ", err);
-    }
-}
 
-function setupDashboardRealtime() {
-    _supabase.channel('dashboard-live-badge')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'withdraw_requests' }, () => {
-            updateWithdrawBadgeCount(); // Live update for withdraw
-        }).subscribe();
-}
+        function setupDashboardRealtime() {
+            _supabase.channel('dashboard-live-badge')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'withdraw_requests' }, () => {
+                    updateWithdrawBadgeCount(); 
+                }).subscribe();
+        }
 
-function setupTopupListener() {
-    _supabase.channel('dashboard-topup-badge')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'topup_requests' }, () => {
-            fetchPendingTopupsCount(); // Live update for top-up
-        })
-        .subscribe();
-}
+        function setupTopupListener() {
+            _supabase.channel('dashboard-topup-badge')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'topup_requests' }, () => {
+                    fetchPendingTopupsCount(); 
+                })
+                .subscribe();
+        }
 
-// 3. JAB PAGE LOAD HO (Dono Realtime Ek Sath Start Honge)
-window.addEventListener('load', () => {
-    // Top-up status active
-    if (typeof fetchPendingTopupsCount === 'function') fetchPendingTopupsCount();
-    setupTopupListener();
+        // 3. JAB PAGE LOAD HO
+        window.addEventListener('load', () => {
+            if (typeof fetchPendingTopupsCount === 'function') fetchPendingTopupsCount();
+            setupTopupListener();
+            updateWithdrawBadgeCount();
+            setupDashboardRealtime();
+        });
 
-    // Withdraw status active
-    updateWithdrawBadgeCount();
-    setupDashboardRealtime();
-});
-
-// 4. CLOCK TIME FUNCTION (Aapka Purana Code)
-setInterval(updateTime, 1000);
-updateTime();
+        // 4. CLOCK TIME FUNCTION
+        setInterval(updateTime, 1000);
+        updateTime();
     </script>
 </body>
 </html>
