@@ -17,19 +17,18 @@
         }
 
         /* RESPONSIVE SIDEBAR MAGIC */
-        /* PC View */
         @media (min-width: 768px) {
             .sidebar {
-                width: 80px; 
-                transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                width: 68px; /* Width kam ki taake minimalist lage */
+                transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             }
             .sidebar:hover {
-                width: 260px; 
+                width: 240px; 
             }
             .nav-text {
                 opacity: 0;
                 transform: translateX(-10px);
-                transition: all 0.3s ease;
+                transition: all 0.2s ease;
                 white-space: nowrap;
             }
             .sidebar:hover .nav-text {
@@ -38,37 +37,35 @@
             }
         }
         
-        /* Mobile View */
         @media (max-width: 767px) {
             .sidebar {
-                width: 260px;
+                width: 240px;
                 position: fixed;
                 top: 0;
                 left: 0;
                 transform: translateX(-100%);
-                transition: transform 0.3s ease-in-out;
+                transition: transform 0.25s ease-in-out;
                 z-index: 50;
             }
             .sidebar.open {
                 transform: translateX(0);
             }
             .nav-text {
-                opacity: 1; /* Mobile pe text hamesha dikhega */
+                opacity: 1; 
                 transform: translateX(0);
                 white-space: nowrap;
             }
         }
 
-        /* Mobile Overlay */
         .overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(2px);
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(1px);
             z-index: 40;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.25s ease;
         }
         .overlay.show {
             display: block;
@@ -76,124 +73,122 @@
         }
     </style>
 </head>
-<body class="flex h-screen w-full relative">
+<body class="flex h-screen w-full relative bg-slate-50">
 
     <div id="mobileOverlay" class="overlay md:hidden"></div>
 
-    <aside id="sidebar" class="sidebar bg-white border-r border-gray-200 h-full flex flex-col group shadow-sm shrink-0">
+    <aside id="sidebar" class="sidebar bg-white border-r border-gray-200 h-full flex flex-col group shrink-0">
         
-        <div class="h-16 flex items-center px-6 border-b border-gray-200 shrink-0 relative">
-            <div class="w-8 h-8 rounded-md bg-slate-800 flex items-center justify-center shrink-0">
-                <i class="fas fa-bolt text-white text-sm"></i>
+        <div class="h-14 flex items-center px-5 border-b border-gray-200 shrink-0 relative">
+            <div class="w-7 h-7 rounded-md bg-slate-800 flex items-center justify-center shrink-0">
+                <i class="fas fa-bolt text-white text-xs"></i>
             </div>
-            <h1 class="nav-text text-base font-bold text-slate-800 tracking-wide ml-4">Faster<span class="text-emerald-600 font-black">Admin</span></h1>
+            <h1 class="nav-text text-sm font-bold text-slate-800 tracking-wide ml-3">Faster<span class="text-emerald-600 font-black">Admin</span></h1>
             
             <button id="closeSidebarBtn" class="md:hidden absolute right-4 text-slate-400 hover:text-slate-800">
-                <i class="fas fa-times text-xl"></i>
+                <i class="fas fa-times text-lg"></i>
             </button>
         </div>
 
-        <nav class="flex-1 overflow-y-auto py-6 space-y-1 overflow-x-hidden">
-            
-            <a href="dashboard.html" class="nav-item flex items-center px-6 py-3 text-emerald-700 bg-emerald-50 border-r-4 border-emerald-600">
-                <i class="nav-icon fas fa-chart-pie w-8 text-center text-lg shrink-0"></i>
-                <span class="nav-text font-semibold text-sm tracking-wide ml-4">Dashboard</span>
+        <nav class="flex-1 overflow-y-auto py-4 space-y-0.5 overflow-x-hidden">
+            <a href="dashboard.html" class="nav-item flex items-center px-5 py-2.5 text-emerald-700 bg-emerald-50 border-r-4 border-emerald-600">
+                <i class="nav-icon fas fa-chart-pie w-6 text-center text-base shrink-0"></i>
+                <span class="nav-text font-semibold text-xs tracking-wide ml-3">Dashboard</span>
             </a>
 
-            <a href="promo-dashboard.html" class="nav-item flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors border-r-4 border-transparent hover:border-slate-300">
-                <i class="nav-icon fas fa-ad w-8 text-center text-lg shrink-0"></i>
-                <span class="nav-text font-medium text-sm tracking-wide ml-4 flex items-center justify-between w-full">
+            <a href="promo-dashboard.html" class="nav-item flex items-center px-5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors border-r-4 border-transparent hover:border-slate-300">
+                <i class="nav-icon fas fa-ad w-6 text-center text-base shrink-0"></i>
+                <span class="nav-text font-medium text-xs tracking-wide ml-3 flex items-center justify-between w-full">
                     Promotions
-                    <span class="bg-emerald-100 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-full ml-2">READY</span>
+                    <span class="bg-emerald-100 text-emerald-700 text-[8px] font-bold px-1.5 py-0.5 rounded ml-2">READY</span>
                 </span>
             </a>
 
-            <a href="settings.html" class="nav-item flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors border-r-4 border-transparent hover:border-slate-300">
-                <i class="nav-icon fas fa-cogs w-8 text-center text-lg shrink-0"></i>
-                <span class="nav-text font-medium text-sm tracking-wide ml-4">Settings</span>
+            <a href="settings.html" class="nav-item flex items-center px-5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors border-r-4 border-transparent hover:border-slate-300">
+                <i class="nav-icon fas fa-cogs w-6 text-center text-base shrink-0"></i>
+                <span class="nav-text font-medium text-xs tracking-wide ml-3">Settings</span>
             </a>
-
         </nav>
 
-        <div class="p-4 border-t border-gray-200">
-            <a href="#" class="nav-item flex items-center px-2 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors">
-                <i class="fas fa-sign-out-alt w-8 text-center text-base shrink-0"></i>
-                <span class="nav-text font-semibold text-sm tracking-wide ml-4">Log Out</span>
+        <div class="p-3 border-t border-gray-200">
+            <a href="#" class="nav-item flex items-center px-2 py-2 text-red-600 hover:bg-red-50 rounded transition-colors">
+                <i class="fas fa-sign-out-alt w-6 text-center text-sm shrink-0"></i>
+                <span class="nav-text font-semibold text-xs tracking-wide ml-3">Log Out</span>
             </a>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full min-w-0 relative bg-slate-50/50">
+    <main class="flex-1 flex flex-col h-full min-w-0 relative">
         
-        <header class="h-16 px-4 md:px-8 flex justify-between items-center border-b border-gray-200 bg-white shrink-0">
+        <header class="h-14 px-4 md:px-6 flex justify-between items-center border-b border-gray-200 bg-white shrink-0">
             <div class="flex items-center gap-3">
-                <button id="openMobileMenu" class="md:hidden text-slate-600 hover:text-emerald-600 focus:outline-none bg-slate-100 p-2 rounded-md">
-                    <i class="fas fa-bars text-lg"></i>
+                <button id="openMobileMenu" class="md:hidden text-slate-600 hover:text-emerald-600 focus:outline-none bg-slate-100 p-1.5 rounded-md">
+                    <i class="fas fa-bars text-base"></i>
                 </button>
-                <h2 class="text-slate-800 font-bold text-base md:text-lg tracking-wide">System Hub</h2>
+                <h2 class="text-slate-800 font-bold text-sm md:text-base tracking-wide">System Hub</h2>
             </div>
 
-            <div class="flex items-center gap-3 md:gap-6">
-                <div class="text-right border-r border-gray-200 pr-3 md:pr-6">
-                    <p class="text-xs md:text-sm font-bold text-slate-800" id="liveTime">00:00:00</p>
-                    <p class="text-[9px] md:text-[10px] text-emerald-600 font-semibold uppercase tracking-wider">Live Connect</p>
+            <div class="flex items-center gap-4">
+                <div class="text-right border-r border-gray-200 pr-4">
+                    <p class="text-xs font-bold text-slate-800" id="liveTime">00:00:00</p>
+                    <p class="text-[9px] text-emerald-600 font-semibold uppercase tracking-wider">Live Connect</p>
                 </div>
-                <div class="flex items-center gap-2 md:gap-3 px-2 md:px-3 py-1.5 rounded-md hover:bg-slate-100 cursor-pointer transition-colors border border-transparent">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></div>
-                    <span class="text-xs md:text-sm font-semibold text-slate-700 hidden sm:block">Waseem Akram</span>
+                <div class="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-slate-50 cursor-pointer transition-colors">
+                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></div>
+                    <span class="text-xs font-semibold text-slate-700 hidden sm:block">Waseem Akram</span>
                 </div>
             </div>
             <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         </header>
 
-        <div id="mainDashboardArea" class="flex-1 p-4 md:p-8 overflow-y-auto">
+        <div id="mainDashboardArea" class="flex-1 p-4 md:p-6 overflow-y-auto">
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 
-                <a href="order-management.html" class="w-full bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
-                    <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors">
-                        <i class="fas fa-clipboard-list text-indigo-500 group-hover:text-emerald-600 text-lg transition-colors"></i>
+                <a href="order-management.html" class="w-full bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-8 h-8 rounded-md bg-indigo-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors">
+                        <i class="fas fa-clipboard-list text-indigo-500 group-hover:text-white text-sm transition-colors"></i>
                     </div>
-                    <h3 class="text-slate-800 font-bold text-sm tracking-wide">Order Management</h3>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <h3 class="text-slate-800 font-bold text-xs tracking-wide group-hover:text-white transition-colors">Order Management</h3>
+                    <p class="text-[11px] text-slate-500 mt-1 leading-normal group-hover:text-emerald-50 transition-colors">
                         Control, Track & Manage orders.
                     </p>
                 </a>
 
-                <a href="admin-topups.html" class="relative w-full bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
-                    <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors relative inline-flex">
-                        <i class="fas fa-wallet text-blue-500 group-hover:text-emerald-600 text-lg transition-colors"></i>
+                <a href="admin-topups.html" class="relative w-full bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors relative inline-flex">
+                        <i class="fas fa-wallet text-blue-500 group-hover:text-white text-sm transition-colors"></i>
                         
-                        <span id="topupBadge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">
+                        <span id="topupBadge" class="hidden absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full border border-white z-10 shadow-sm">
                             0
                         </span>
                     </div>
-                    <h3 class="text-slate-800 font-bold text-sm tracking-wide">Top-Up Wallet</h3>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <h3 class="text-slate-800 font-bold text-xs tracking-wide group-hover:text-white transition-colors">Top-Up Wallet</h3>
+                    <p class="text-[11px] text-slate-500 mt-1 leading-normal group-hover:text-emerald-50 transition-colors">
                         Control & track wallet topup requests.
                     </p>
                 </a>
 
-                <a href="withdraw-requests.html" class="relative w-full bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
-                    <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors relative inline-flex">
-                        <i class="fas fa-arrow-up text-orange-500 group-hover:text-emerald-600 text-lg transition-colors"></i>
+                <a href="withdraw-requests.html" class="relative w-full bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-8 h-8 rounded-md bg-orange-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors relative inline-flex">
+                        <i class="fas fa-arrow-up text-orange-500 group-hover:text-white text-sm transition-colors"></i>
                         
-                        <span id="withdrawBadge" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">
+                        <span id="withdrawBadge" class="hidden absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full border border-white z-10 shadow-sm">
                             0
                         </span>
                     </div>
-                    <h3 class="text-slate-800 font-bold text-sm tracking-wide">Withdraw</h3>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <h3 class="text-slate-800 font-bold text-xs tracking-wide group-hover:text-white transition-colors">Withdraw</h3>
+                    <p class="text-[11px] text-slate-500 mt-1 leading-normal group-hover:text-emerald-50 transition-colors">
                         Control & track wallet withdraw requests.
                     </p>
                 </a>
 
-                <a href="wallets-control.html" class="relative w-full bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200 group flex flex-col cursor-pointer">
-                    <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center mb-4 group-hover:bg-emerald-50 transition-colors relative inline-flex">
-                        <i class="fas fa-chart-line text-purple-500 group-hover:text-emerald-600 text-lg transition-colors"></i>
+                <a href="wallets-control.html" class="relative w-full bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-8 h-8 rounded-md bg-purple-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors relative inline-flex">
+                        <i class="fas fa-chart-line text-purple-500 group-hover:text-white text-sm transition-colors"></i>
                     </div>
-                    <h3 class="text-slate-800 font-bold text-sm tracking-wide">Financial Details</h3>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <h3 class="text-slate-800 font-bold text-xs tracking-wide group-hover:text-white transition-colors">Financial Details</h3>
+                    <p class="text-[11px] text-slate-500 mt-1 leading-normal group-hover:text-emerald-50 transition-colors">
                         Transactions and balance history.
                     </p>
                 </a>
@@ -219,7 +214,6 @@
     </script>
 
     <script>
-        // Live Clock with Seconds
         function updateTime() {
             const now = new Date();
             let hours = now.getHours();
@@ -232,14 +226,11 @@
             seconds = seconds < 10 ? '0' + seconds : seconds;
             document.getElementById('liveTime').innerText = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
         }
-        // --- REALTIME TOP-UP BADGE LOGIC ---
         
-        // 1. Supabase Setup
         const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        // 2. Fetch Pending Count
         async function fetchPendingTopupsCount() {
             try {
                 const { count, error } = await _supabase
@@ -261,7 +252,6 @@
             }
         }
 
-        // 1. WITHDRAW BADGE COUNT & REALTIME
         async function updateWithdrawBadgeCount() {
             try {
                 const { count, error } = await _supabase
@@ -298,7 +288,6 @@
                 .subscribe();
         }
 
-        // 3. JAB PAGE LOAD HO
         window.addEventListener('load', () => {
             if (typeof fetchPendingTopupsCount === 'function') fetchPendingTopupsCount();
             setupTopupListener();
@@ -306,7 +295,6 @@
             setupDashboardRealtime();
         });
 
-        // 4. CLOCK TIME FUNCTION
         setInterval(updateTime, 1000);
         updateTime();
     </script>
