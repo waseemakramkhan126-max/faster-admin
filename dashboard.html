@@ -81,21 +81,35 @@
                     <i class="fas fa-home"></i> Home
                 </a>
                 
-                <div class="relative group">
+                <div class="relative group py-2">
                     <button class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
                         <i class="fas fa-plus"></i> Add
                     </button>
-                    <div class="absolute top-full left-0 mt-1 w-48 bg-white border border-slate-100 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                        <a href="add-order.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white">Add New Order</a>
+                    <div class="absolute top-full left-0 mt-0 w-48 bg-white border border-slate-100 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <a href="add-order.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-t-lg">Add New Order</a>
                         <a href="add-rider.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white">Add New Rider</a>
-                        <a href="announcement.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white">Announcement</a>
+                        <a href="announcement.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-b-lg">Announcement</a>
                     </div>
                 </div>
 
-                <a href="shops.html" class="px-3 py-2 rounded-md bg-emerald-500 text-white transition-all">Shops</a>
-                <a href="admin-topups.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Top-up</a>
-                <a href="withdraw-requests.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Payout</a>
+                <a href="shops.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Shops</a>
+                
+                <a href="admin-topups.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+                    <span>Top-up</span>
+                    <span class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">5</span>
+                </a>
+                
+                <a href="withdraw-requests.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+                    <span>Payout</span>
+                    <span class="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">3</span>
+                </a>
+                
                 <a href="reports.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Reports</a>
+                
+                <a href="financials.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                    <i class="fas fa-chart-line text-xs"></i> Financials
+                </a>
+
                 <a href="settings.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Settings</a>
             </nav>
         </header>
@@ -103,32 +117,36 @@
         <div class="flex-1 p-6 overflow-y-auto">
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 
-                <a href="order-management.html" class="bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                <a href="active-orders.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
                     <div class="w-9 h-9 rounded-md bg-sky-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
-                        <i class="fas fa-clipboard-list text-sky-600 group-hover:text-white"></i>
+                        <i class="fas fa-bolt text-sky-600 group-hover:text-white"></i>
                     </div>
-                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Order Management</h3>
+                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Active Orders</h3>
+                    <span class="absolute top-4 right-4 bg-sky-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">12</span>
                 </a>
 
-                <a href="admin-topups.html" class="bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
-                    <div class="w-9 h-9 rounded-md bg-emerald-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
-                        <i class="fas fa-wallet text-emerald-600 group-hover:text-white"></i>
-                    </div>
-                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Top-Up Wallet</h3>
-                </a>
-
-                <a href="withdraw.html" class="bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                <a href="pending-orders.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
                     <div class="w-9 h-9 rounded-md bg-amber-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
-                        <i class="fas fa-arrow-up text-amber-600 group-hover:text-white"></i>
+                        <i class="fas fa-clock text-amber-600 group-hover:text-white"></i>
                     </div>
-                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Withdraw</h3>
+                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Pending Orders</h3>
+                    <span class="absolute top-4 right-4 bg-amber-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">4</span>
                 </a>
 
-                <a href="financials.html" class="bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
-                    <div class="w-9 h-9 rounded-md bg-purple-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
-                        <i class="fas fa-chart-line text-purple-600 group-hover:text-white"></i>
+                <a href="completed-orders.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                    <div class="w-9 h-9 rounded-md bg-emerald-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
+                        <i class="fas fa-check-circle text-emerald-600 group-hover:text-white"></i>
                     </div>
-                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Financials</h3>
+                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Completed Orders</h3>
+                    <span class="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">142</span>
+                </a>
+
+                <a href="canceled-orders.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                    <div class="w-9 h-9 rounded-md bg-rose-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
+                        <i class="fas fa-times-circle text-rose-600 group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Canceled Orders</h3>
+                    <span class="absolute top-4 right-4 bg-rose-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">8</span>
                 </a>
 
             </div>
