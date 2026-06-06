@@ -18,6 +18,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; 
 </head>
 <body class="min-h-screen flex flex-col p-4 sm:p-6">
 
+    <!-- Header Section -->
     <header class="max-w-6xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center border-b border-slate-800 pb-5 mb-6 gap-4">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500">
@@ -34,15 +35,20 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; 
         </div>
     </header>
 
+    <!-- Main Container -->
     <main class="max-w-6xl mx-auto w-full flex-1">
+        <!-- Loader -->
         <div id="mainLoader" class="flex flex-col items-center justify-center py-24 opacity-40">
             <i class="fas fa-circle-notch animate-spin text-3xl text-orange-500 mb-3"></i>
             <p class="text-xs font-bold uppercase tracking-widest text-slate-300">Fetching Pending Orders...</p>
         </div>
 
-        <div id="ordersList" class="hidden grid grid-cols-1 md:grid-cols-2 gap-5">
-            </div>
+        <!-- ⚡ UPDATED: Changed grid to a Full Width Vertical Flex Layout -->
+        <div id="ordersList" class="hidden flex flex-col gap-3 w-full">
+            <!-- Dynamic row cards will render here -->
+        </div>
 
+        <!-- Empty State Container -->
         <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center glass-card rounded-3xl p-8">
             <div class="w-16 h-16 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-500 mb-4 text-xl">
                 <i class="fas fa-box-open"></i>
@@ -52,6 +58,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; 
         </div>
     </main>
 
+    <!-- ASSIGN RIDER MODAL -->
     <div id="riderModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-[2rem] p-6 shadow-2xl flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
@@ -64,11 +71,14 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; 
                 </button>
             </div>
             
+            <!-- Rider List Box -->
             <div id="ridersContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1 min-h-[250px]">
-                </div>
+                <!-- Riders dynamic items -->
+            </div>
         </div>
     </div>
 
+    <!-- SUPABASE CONFIG & LOGIC -->
     <script>
         const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
@@ -100,48 +110,54 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; 
                 emptyState.classList.add('hidden');
                 container.classList.remove('hidden');
 
+                // ⚡ UPDATED: HTML structure changed to a streamlined, low-height row format
                 container.innerHTML = orders.map(order => {
                     const timeStr = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const dateStr = new Date(order.created_at).toLocaleDateString();
                     
-                    return `
-                        <div class="glass-card rounded-[2rem] p-5 flex flex-col justify-between hover:border-slate-700 transition-all relative overflow-hidden group">
-                            <div class="absolute top-0 right-0 bg-orange-500/10 text-orange-400 px-4 py-1.5 rounded-bl-2xl text-[9px] font-black uppercase tracking-widest border-l border-b border-orange-500/10">
-                                Pending
-                            </div>
+                    // Puraane breaks ko single line comma separation me convert kiya details short rakhne k liye
+                    const shortDetails = order.order_details ? order.order_details.replace(/\n/g, ', ') : 'No items description.';
 
-                            <div>
-                                <div class="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400 mb-3">
+                    return `
+                        <div class="glass-card rounded-2xl p-3 sm:px-5 sm:py-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:border-slate-700 transition-all relative group w-full">
+                            
+                            <!-- Section 1: Customer Info & ID -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400 mb-1">
                                     <span class="text-white font-black">ID: #${order.id.toString().slice(-6).toUpperCase()}</span>
                                     <span>•</span>
                                     <span><i class="fas fa-clock text-blue-400 mr-1"></i>${timeStr}</span>
-                                    <span>•</span>
-                                    <span>${dateStr}</span>
+                                    <span class="hidden sm:inline">•</span>
+                                    <span class="hidden sm:inline text-[9px]">${dateStr}</span>
+                                    <span class="ml-1 bg-orange-500/10 text-orange-400 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">Pending</span>
                                 </div>
-
-                                <div class="mb-4">
-                                    <h4 class="text-white font-black text-sm tracking-tight">${order.customer_name || 'Walking Customer'}</h4>
-                                    <p class="text-[11px] font-bold text-slate-400 mt-0.5"><i class="fas fa-phone-alt text-[9px] mr-1 text-slate-500"></i>${order.customer_phone}</p>
-                                    <p class="text-[11px] font-medium text-orange-400/90 mt-1 line-clamp-2 uppercase tracking-tight"><i class="fas fa-map-marker-alt text-[9px] mr-1 text-orange-500"></i>${order.delivery_address || 'No Address Provided'}</p>
-                                </div>
-
-                                <div class="bg-slate-950/40 border border-slate-800/60 rounded-2xl p-3 mb-4 text-xs">
-                                    <p class="font-black text-[9px] text-slate-500 uppercase tracking-widest mb-1.5">Order Details</p>
-                                    <div class="text-slate-300 font-semibold leading-relaxed whitespace-pre-line">${order.order_details || 'No items description found.'}</div>
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                                    <h4 class="text-white font-black text-sm truncate max-w-[180px]">${order.customer_name || 'Customer'}</h4>
+                                    <span class="hidden sm:inline text-slate-700">|</span>
+                                    <p class="text-[11px] font-medium text-orange-400/90 truncate"><i class="fas fa-map-marker-alt text-[9px] mr-1 text-orange-500"></i>${order.delivery_address || 'No Address'}</p>
                                 </div>
                             </div>
 
-                            <div class="pt-3 border-t border-slate-800/60 flex items-center justify-between gap-4">
-                                <div>
-                                    <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Estimated Bill</p>
-                                    <p class="text-lg font-black text-white">Rs. ${order.bill_amount || 0}</p>
+                            <!-- Section 2: Inline Compact Order Details Box -->
+                            <div class="flex-1 min-w-0 bg-slate-950/30 border border-slate-800/40 rounded-xl px-3 py-1.5 lg:max-w-md">
+                                <p class="font-black text-[8px] text-slate-500 uppercase tracking-widest mb-0.5">Order Items</p>
+                                <p class="text-slate-300 text-xs font-semibold truncate">${shortDetails}</p>
+                            </div>
+
+                            <!-- Section 3: Pricing & Action Buttons -->
+                            <div class="flex items-center justify-between lg:justify-end gap-5 border-t border-slate-800/40 pt-2.5 lg:pt-0 lg:border-t-0 shrink-0">
+                                <div class="lg:text-right">
+                                    <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Est. Bill</p>
+                                    <p class="text-base font-black text-white">Rs. ${order.bill_amount || 0}</p>
                                 </div>
-                                <div class="flex gap-2 flex-1 justify-end">
-                                    <button onclick="triggerCancelOrder(${order.id})" class="px-4 py-3 bg-red-500/10 hover:bg-red-500 border border-red-500/20 hover:border-red-600 text-red-400 hover:text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all flex items-center gap-1.5">
-                                        <i class="fas fa-ban"></i> Cancel
+                                <div class="flex gap-2">
+                                    <!-- Cancel -->
+                                    <button onclick="triggerCancelOrder(${order.id})" class="px-3 py-2 bg-red-500/10 hover:bg-red-500 border border-red-500/20 hover:border-red-600 text-red-400 hover:text-white font-black text-[9px] uppercase tracking-widest rounded-lg transition-all flex items-center gap-1">
+                                        <i class="fas fa-ban text-[8px]"></i> Cancel
                                     </button>
-                                    <button onclick="openRiderModal(${order.id})" class="px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-lg hover:shadow-blue-600/20 active:scale-95 transition-all flex items-center gap-1.5">
-                                        <i class="fas fa-paper-plane"></i> Assign Rider
+                                    <!-- Assign -->
+                                    <button onclick="openRiderModal(${order.id})" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-black text-[9px] uppercase tracking-widest rounded-lg shadow-lg hover:shadow-blue-600/20 active:scale-95 transition-all flex items-center gap-1">
+                                        <i class="fas fa-paper-plane text-[8px]"></i> Assign
                                     </button>
                                 </div>
                             </div>
@@ -158,7 +174,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; 
         // --- CANCEL ORDER FUNCTIONALITY WITH REASON ---
         async function triggerCancelOrder(id) {
             const reason = prompt("Order cancel karne ki wajah (Reason) likhen:");
-            if (reason === null) return; // Cancel trigger sequence aborted
+            if (reason === null) return; 
             if (reason.trim() === "") {
                 alert("❌ Reason likhna zaroori hai order cancel karne ke liye!");
                 return;
@@ -194,7 +210,6 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; 
             listContainer.innerHTML = `<div class="text-center py-10 opacity-40"><i class="fas fa-circle-notch animate-spin text-lg mb-1"></i><p class="text-[10px] font-bold uppercase tracking-wider">Loading Riders...</p></div>`;
 
             try {
-                // Fetching riders list
                 const { data: riders, error } = await _supabase.from('riders').select('*');
                 if (error) throw error;
 
@@ -238,7 +253,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; 
                     .from('orders')
                     .update({
                         rider_phone: riderPhone,
-                        status: 'assigned', // Status changed from pending to assigned
+                        status: 'assigned', 
                         rider_status: 'Assigned',
                         updated_at: new Date().toISOString()
                     })
@@ -259,12 +274,10 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; 
         function initiateRealtimeTracker() {
             _supabase.channel('live-pending-tracker')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-                    console.log("Realtime Alert: Table synchronized.");
                     loadPendingOrders();
                 }).subscribe();
         }
 
-        // --- INITIALIZATION ---
         window.onload = () => {
             loadPendingOrders();
             initiateRealtimeTracker();
