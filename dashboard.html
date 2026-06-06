@@ -6,8 +6,9 @@
     <title>Faster Admin - Premium Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; overflow: hidden; }
         
         /* SCROLLBAR HIDING */
@@ -96,12 +97,12 @@
                 
                 <a href="admin-topups.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
                     <span>Top-up</span>
-                    <span class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">5</span>
+                    <span id="badgeTopup" class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
                 </a>
                 
                 <a href="withdraw-requests.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
                     <span>Payout</span>
-                    <span class="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">3</span>
+                    <span id="badgePayout" class="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
                 </a>
                 
                 <a href="reports.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Reports</a>
@@ -112,41 +113,45 @@
 
                 <a href="settings.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Settings</a>
             </nav>
+            
+            <div class="text-[10px] font-bold text-emerald-500 uppercase flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live
+            </div>
         </header>
 
         <div class="flex-1 p-6 overflow-y-auto">
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 
-                <a href="active-orders.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                <a href="order-management.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
                     <div class="w-9 h-9 rounded-md bg-sky-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
-                        <i class="fas fa-cart-shopping text-sky-600 group-hover:text-white"></i>
+                        <i class="fas fa-bolt text-sky-600 group-hover:text-white"></i>
                     </div>
                     <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Active Orders</h3>
-                    <span class="absolute top-4 right-4 bg-sky-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">12</span>
+                    <span id="badgeActive" class="absolute top-4 right-4 bg-sky-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
                 </a>
 
-                <a href="pending-orders.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                <a href="order-management.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
                     <div class="w-9 h-9 rounded-md bg-amber-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
                         <i class="fas fa-clock text-amber-600 group-hover:text-white"></i>
                     </div>
                     <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Pending Orders</h3>
-                    <span class="absolute top-4 right-4 bg-amber-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">4</span>
+                    <span id="badgePending" class="absolute top-4 right-4 bg-amber-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
                 </a>
 
-                <a href="completed-orders.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                <a href="order-management.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
                     <div class="w-9 h-9 rounded-md bg-emerald-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
                         <i class="fas fa-check-circle text-emerald-600 group-hover:text-white"></i>
                     </div>
                     <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Completed Orders</h3>
-                    <span class="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">142</span>
+                    <span id="badgeCompleted" class="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
                 </a>
 
-                <a href="canceled-orders.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                <a href="order-management.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
                     <div class="w-9 h-9 rounded-md bg-rose-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
                         <i class="fas fa-times-circle text-rose-600 group-hover:text-white"></i>
                     </div>
                     <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Canceled Orders</h3>
-                    <span class="absolute top-4 right-4 bg-rose-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">8</span>
+                    <span id="badgeCanceled" class="absolute top-4 right-4 bg-rose-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
                 </a>
 
             </div>
@@ -154,6 +159,7 @@
     </main>
 
     <script>
+        // Mobile Sidebar Controls
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('mobileOverlay');
         const openBtn = document.getElementById('openMobileMenu');
@@ -166,6 +172,64 @@
             sidebar.classList.remove('open');
             overlay.classList.remove('show');
         });
+
+        // ─── SUPABASE INTEGRATION LOGIC ──────────────────────────────────────
+        const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        // Fetch Counts and Update UI
+        async function fetchDashboardCounts() {
+            try {
+                // Ek saath tamam queries execute karna speed k liye
+                const [topupsRes, withdrawsRes, activeOrdersRes, pendingOrdersRes, completedOrdersRes, canceledOrdersRes] = await Promise.all([
+                    _supabase.from('topup_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+                    _supabase.from('withdraw_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['assigned', 'processing']),
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['canceled', 'cancelled', 'CANCELLED'])
+                ]);
+
+                // Inner HTML counters update krna
+                document.getElementById('badgeTopup').innerText = topupsRes.count || 0;
+                document.getElementById('badgePayout').innerText = withdrawsRes.count || 0;
+                document.getElementById('badgeActive').innerText = activeOrdersRes.count || 0;
+                document.getElementById('badgePending').innerText = pendingOrdersRes.count || 0;
+                document.getElementById('badgeCompleted').innerText = completedOrdersRes.count || 0;
+                document.getElementById('badgeCanceled').innerText = canceledOrdersRes.count || 0;
+
+            } catch (error) {
+                console.error("Dashboard Sync Error:", error);
+            }
+        }
+
+        // Realtime Channels Sync Setup
+        function setupDashboardLiveSync() {
+            // 1. Listen to Orders Changes
+            _supabase.channel('db-orders-sync')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+                    fetchDashboardCounts();
+                }).subscribe();
+
+            // 2. Listen to Topup Changes
+            _supabase.channel('db-topups-sync')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'topup_requests' }, () => {
+                    fetchDashboardCounts();
+                }).subscribe();
+
+            // 3. Listen to Withdraw Changes
+            _supabase.channel('db-withdraws-sync')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'withdraw_requests' }, () => {
+                    fetchDashboardCounts();
+                }).subscribe();
+        }
+
+        // Initialize Everything on Load
+        window.onload = () => {
+            fetchDashboardCounts();
+            setupDashboardLiveSync();
+        };
     </script>
 </body>
 </html>
