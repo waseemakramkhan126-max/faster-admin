@@ -10,17 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
         :root {
-            /* Multitasker Premium Solid Theme Colors (Names & Percentages/RGB Controls) */
-            --theme-primary-rgb: 0, 119, 185;       /* #0077b9 - Premium Fintech Blue */
-            --theme-success-rgb: 16, 185, 129;     /* #10b981 - Elegant Emerald */
-            --theme-dark-rgb: 30, 41, 59;           /* #1e293b - Deep Slate */
-            --theme-bg-rgb: 248, 250, 252;         /* #f8fafc - Solid Soft White */
-            
-            /* High-Fidelity Solid Opacity Variables for easy manual adjustment */
-            --bg-solid-100: rgba(255, 255, 255, 100%);
-            --border-solid-100: rgba(226, 232, 240, 100%);
-            --accent-solid-10: rgba(0, 119, 185, 10%);
-            --accent-solid-100: rgba(0, 119, 185, 100%);
+            --theme-bg-rgb: 248, 250, 252; /* #f8fafc */
         }
 
         body { 
@@ -30,30 +20,13 @@
             overflow: hidden; 
         }
 
-        /* PREMIUM SOLID UI ADJUSTMENTS */
-        .premium-card {
-            background-color: var(--bg-solid-100);
-            border: 1px solid var(--border-solid-100);
-            border-bottom: 3px solid var(--border-solid-100);
-            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .premium-card:hover {
-            border-color: var(--accent-solid-100);
-            border-bottom-color: var(--accent-solid-100);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(var(--theme-primary-rgb), 0.08);
-        }
-
         /* RESPONSIVE SIDEBAR MAGIC */
         @media (min-width: 768px) {
             .sidebar {
                 width: 72px;
                 transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             }
-            .sidebar:hover {
-                width: 256px; 
-            }
+            .sidebar:hover { width: 256px; }
             .nav-text {
                 opacity: 0;
                 transform: translateX(-8px);
@@ -74,15 +47,12 @@
             .sidebar {
                 width: 256px;
                 position: fixed;
-                top: 0;
-                left: 0;
+                top: 0; left: 0;
                 transform: translateX(-100%);
                 transition: transform 0.25s ease-in-out;
                 z-index: 50;
             }
-            .sidebar.open {
-                transform: translateX(0);
-            }
+            .sidebar.open { transform: translateX(0); }
             .nav-text {
                 opacity: 1; 
                 transform: translateX(0);
@@ -91,23 +61,16 @@
         }
 
         .overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
+            display: none; position: fixed; inset: 0;
             background: rgba(15, 23, 42, 0.6);
-            z-index: 40;
-            opacity: 0;
-            transition: opacity 0.25s ease;
+            z-index: 40; opacity: 0; transition: opacity 0.25s ease;
         }
-        .overlay.show {
-            display: block;
-            opacity: 1;
-        }
+        .overlay.show { display: block; opacity: 1; }
 
         .active-nav {
-            background-color: var(--accent-solid-10);
-            color: var(--accent-solid-100);
-            border-right: 4px solid var(--accent-solid-100);
+            background-color: rgba(0, 119, 185, 0.1);
+            color: #0077b9;
+            border-right: 4px solid #0077b9;
         }
     </style>
 </head>
@@ -116,7 +79,6 @@
     <div id="mobileOverlay" class="overlay md:hidden"></div>
 
     <aside id="sidebar" class="sidebar bg-white border-r border-slate-200 h-full flex flex-col group shrink-0 z-30 shadow-sm">
-        
         <div class="h-16 flex items-center px-5 border-b border-slate-100 shrink-0 relative justify-between md:justify-start">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center shrink-0 shadow-sm">
@@ -126,7 +88,6 @@
                     Faster<span class="text-sky-600 font-extrabold">Hub</span>
                 </h1>
             </div>
-            
             <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-slate-800 p-1">
                 <i class="fas fa-times text-lg"></i>
             </button>
@@ -137,15 +98,12 @@
                 <i class="nav-icon fas fa-chart-pie w-6 text-center text-lg shrink-0"></i>
                 <span class="nav-text font-semibold text-xs tracking-wide ml-3">Dashboard</span>
             </a>
-
             <a href="promo-dashboard.html" class="nav-item flex items-center px-3 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-all duration-150 border-r-4 border-transparent">
                 <i class="nav-icon fas fa-ad w-6 text-center text-lg shrink-0"></i>
                 <span class="nav-text font-medium text-xs tracking-wide ml-3 flex items-center justify-between w-full">
-                    Promotions
-                    <span class="bg-emerald-100 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-md ml-2">READY</span>
+                    Promotions <span class="bg-emerald-100 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-md ml-2">READY</span>
                 </span>
             </a>
-
             <a href="settings.html" class="nav-item flex items-center px-3 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-all duration-150 border-r-4 border-transparent">
                 <i class="nav-icon fas fa-cogs w-6 text-center text-lg shrink-0"></i>
                 <span class="nav-text font-medium text-xs tracking-wide ml-3">Settings</span>
@@ -161,7 +119,6 @@
     </aside>
 
     <main class="flex-1 flex flex-col h-full min-w-0 relative bg-slate-50">
-        
         <header class="h-16 px-6 flex justify-between items-center border-b border-slate-200 bg-white shrink-0 shadow-sm z-20">
             <div class="flex items-center gap-4">
                 <button id="openMobileMenu" class="md:hidden text-slate-600 hover:text-sky-600 focus:outline-none bg-slate-100 p-2 rounded-lg transition-colors">
@@ -187,76 +144,94 @@
                     <span class="text-xs font-bold text-slate-700 hidden sm:block">Waseem Akram</span>
                 </div>
             </div>
-            
             <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         </header>
 
-        <div id="mainDashboardArea" class="flex-1 p-6 md:p-8 overflow-y-auto">
+        <div id="mainDashboardArea" class="flex-1 p-5 md:p-6 overflow-y-auto">
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center shrink-0">
+                        <i class="fas fa-chart-line text-sky-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-0.5">Total Sales</p>
+                        <h4 class="text-sm md:text-base font-black text-slate-800">Rs 45,200</h4>
+                    </div>
+                </div>
                 
-                <a href="order-management.html" class="premium-card rounded-xl p-5 shadow-sm flex flex-col cursor-pointer group">
-                    <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center mb-4 border border-sky-100 transition-colors group-hover:bg-sky-600">
-                        <i class="fas fa-clipboard-list text-sky-600 group-hover:text-white text-base transition-colors"></i>
+                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                        <i class="fas fa-users text-emerald-600 text-lg"></i>
                     </div>
-                    <h3 class="text-slate-900 font-bold text-sm tracking-wide transition-colors">Order Management</h3>
-                    <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                        Control, Track & Manage real-time active system orders seamlessly.
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-0.5">Active Users</p>
+                        <h4 class="text-sm md:text-base font-black text-slate-800">1,234</h4>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
+                        <i class="fas fa-money-bill-wave text-amber-500 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-0.5">Withdrawals</p>
+                        <h4 class="text-sm md:text-base font-black text-slate-800">Rs 12,800</h4>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
+                        <i class="fas fa-box text-purple-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-0.5">Products</p>
+                        <h4 class="text-sm md:text-base font-black text-slate-800">856</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <a href="order-management.html" class="w-full bg-white rounded-lg p-3.5 border border-slate-200 border-b-2 shadow-sm hover:bg-emerald-500 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-8 h-8 rounded-md bg-slate-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors">
+                        <i class="fas fa-clipboard-list text-slate-600 group-hover:text-white text-sm transition-colors"></i>
+                    </div>
+                    <h3 class="text-slate-800 font-bold text-[13px] tracking-wide group-hover:text-white transition-colors">Order Manage</h3>
+                    <p class="text-[10px] text-slate-500 mt-1 leading-snug group-hover:text-emerald-50 transition-colors">
+                        Track & manage active orders.
                     </p>
-                    <div class="mt-auto pt-4 flex items-center justify-between text-[11px] font-bold text-sky-600 opacity-80 group-hover:opacity-100">
-                        <span>Launch Terminal</span>
-                        <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
-                    </div>
                 </a>
 
-                <a href="admin-topups.html" class="premium-card relative rounded-xl p-5 shadow-sm flex flex-col cursor-pointer group">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-4 border border-emerald-100 transition-colors group-hover:bg-emerald-600 relative inline-flex">
-                        <i class="fas fa-wallet text-emerald-600 group-hover:text-white text-base transition-colors"></i>
-                        
-                        <span id="topupBadge" class="hidden absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[10px] font-black min-w-[18px] h-4.5 px-1 flex items-center justify-center rounded-full border-2 border-white z-10 shadow-md animate-bounce">
-                            0
-                        </span>
+                <a href="admin-topups.html" class="w-full bg-white relative rounded-lg p-3.5 border border-slate-200 border-b-2 shadow-sm hover:bg-emerald-500 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-8 h-8 rounded-md bg-slate-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors inline-flex w-max">
+                        <i class="fas fa-wallet text-slate-600 group-hover:text-white text-sm transition-colors"></i>
+                        <span id="topupBadge" class="hidden absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[9px] font-black min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full border border-white z-10 shadow-sm">0</span>
                     </div>
-                    <h3 class="text-slate-900 font-bold text-sm tracking-wide transition-colors">Top-Up Wallet</h3>
-                    <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                        Control, audit & verify customer incoming balance topup requests.
+                    <h3 class="text-slate-800 font-bold text-[13px] tracking-wide group-hover:text-white transition-colors">Top-Up Wallet</h3>
+                    <p class="text-[10px] text-slate-500 mt-1 leading-snug group-hover:text-emerald-50 transition-colors">
+                        Verify balance requests.
                     </p>
-                    <div class="mt-auto pt-4 flex items-center justify-between text-[11px] font-bold text-emerald-600 opacity-80 group-hover:opacity-100">
-                        <span>View Requests</span>
-                        <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
-                    </div>
                 </a>
 
-                <a href="withdraw-requests.html" class="premium-card relative rounded-xl p-5 shadow-sm flex flex-col cursor-pointer group">
-                    <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-4 border border-amber-100 transition-colors group-hover:bg-amber-600 relative inline-flex">
-                        <i class="fas fa-arrow-up text-amber-500 group-hover:text-white text-base transition-colors"></i>
-                        
-                        <span id="withdrawBadge" class="hidden absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[10px] font-black min-w-[18px] h-4.5 px-1 flex items-center justify-center rounded-full border-2 border-white z-10 shadow-md animate-bounce">
-                            0
-                        </span>
+                <a href="withdraw-requests.html" class="w-full bg-white relative rounded-lg p-3.5 border border-slate-200 border-b-2 shadow-sm hover:bg-emerald-500 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-8 h-8 rounded-md bg-slate-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors inline-flex w-max">
+                        <i class="fas fa-arrow-up text-slate-600 group-hover:text-white text-sm transition-colors"></i>
+                        <span id="withdrawBadge" class="hidden absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[9px] font-black min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full border border-white z-10 shadow-sm">0</span>
                     </div>
-                    <h3 class="text-slate-900 font-bold text-sm tracking-wide transition-colors">Withdraw Handler</h3>
-                    <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                        Process and track wallet outward balance disbursement requests safely.
+                    <h3 class="text-slate-800 font-bold text-[13px] tracking-wide group-hover:text-white transition-colors">Withdraw</h3>
+                    <p class="text-[10px] text-slate-500 mt-1 leading-snug group-hover:text-emerald-50 transition-colors">
+                        Process payout requests.
                     </p>
-                    <div class="mt-auto pt-4 flex items-center justify-between text-[11px] font-bold text-amber-600 opacity-80 group-hover:opacity-100">
-                        <span>Manage Payouts</span>
-                        <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
-                    </div>
                 </a>
 
-                <a href="wallets-control.html" class="premium-card relative rounded-xl p-5 shadow-sm flex flex-col cursor-pointer group">
-                    <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center mb-4 border border-violet-100 transition-colors group-hover:bg-violet-600 relative inline-flex">
-                        <i class="fas fa-chart-line text-violet-600 group-hover:text-white text-base transition-colors"></i>
+                <a href="wallets-control.html" class="w-full bg-white relative rounded-lg p-3.5 border border-slate-200 border-b-2 shadow-sm hover:bg-emerald-500 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
+                    <div class="w-8 h-8 rounded-md bg-slate-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors inline-flex w-max">
+                        <i class="fas fa-chart-line text-slate-600 group-hover:text-white text-sm transition-colors"></i>
                     </div>
-                    <h3 class="text-slate-900 font-bold text-sm tracking-wide transition-colors">Financial Details</h3>
-                    <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                        Comprehensive ledger audit trail history logs and balance monitoring metrics.
+                    <h3 class="text-slate-800 font-bold text-[13px] tracking-wide group-hover:text-white transition-colors">Financials</h3>
+                    <p class="text-[10px] text-slate-500 mt-1 leading-snug group-hover:text-emerald-50 transition-colors">
+                        Ledger & history logs.
                     </p>
-                    <div class="mt-auto pt-4 flex items-center justify-between text-[11px] font-bold text-violet-600 opacity-80 group-hover:opacity-100">
-                        <span>Open Ledger</span>
-                        <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
-                    </div>
                 </a>
 
             </div>
@@ -277,9 +252,7 @@
         openBtn.addEventListener('click', toggleSidebar);
         closeBtn.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
-    </script>
 
-    <script>
         function updateTime() {
             const now = new Date();
             let hours = now.getHours();
@@ -299,59 +272,37 @@
 
         async function fetchPendingTopupsCount() {
             try {
-                const { count, error } = await _supabase
-                    .from('topup_requests')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'pending');
-                
+                const { count, error } = await _supabase.from('topup_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
                 if (error) throw error;
-                
                 const badge = document.getElementById('topupBadge');
                 if (count > 0) {
                     badge.innerText = count > 99 ? '99+' : count; 
                     badge.classList.remove('hidden'); 
-                } else {
-                    badge.classList.add('hidden'); 
-                }
-            } catch (err) {
-                console.error("Error fetching topup count:", err);
-            }
+                } else { badge.classList.add('hidden'); }
+            } catch (err) { console.error(err); }
         }
 
         async function updateWithdrawBadgeCount() {
             try {
-                const { count, error } = await _supabase
-                    .from('withdraw_requests')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'pending');
-
+                const { count, error } = await _supabase.from('withdraw_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending');
                 const badge = document.getElementById('withdrawBadge');
                 if (badge) {
                     if (!error && count > 0) {
                         badge.innerText = count;
                         badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
-                    }
+                    } else { badge.classList.add('hidden'); }
                 }
-            } catch (err) {
-                console.error("Withdraw badge error: ", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         function setupDashboardRealtime() {
             _supabase.channel('dashboard-live-badge')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'withdraw_requests' }, () => {
-                    updateWithdrawBadgeCount(); 
-                }).subscribe();
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'withdraw_requests' }, () => { updateWithdrawBadgeCount(); }).subscribe();
         }
 
         function setupTopupListener() {
             _supabase.channel('dashboard-topup-badge')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'topup_requests' }, () => {
-                    fetchPendingTopupsCount(); 
-                })
-                .subscribe();
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'topup_requests' }, () => { fetchPendingTopupsCount(); }).subscribe();
         }
 
         window.addEventListener('load', () => {
