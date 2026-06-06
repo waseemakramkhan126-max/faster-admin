@@ -139,7 +139,7 @@
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
         let activeTargetOrderId = null;
-        let globalRidersArray = []; // Caching global records securely
+        let globalRidersArray = []; 
 
         // --- FETCH & LOAD PENDING ORDERS ---
         async function loadPendingOrders() {
@@ -255,7 +255,6 @@
             listContainer.innerHTML = `<div class="text-center py-10 opacity-60"><i class="fas fa-circle-notch animate-spin text-lg mb-1 text-slate-600"></i><p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Loading Riders...</p></div>`;
 
             try {
-                // ⚡ Fetching explicitly sorting data by rider_id column
                 const { data: riders, error } = await _supabase.from('riders').select('*').order('rider_id', { ascending: true });
                 if (error) throw error;
 
@@ -267,7 +266,7 @@
             }
         }
 
-        // ⚡ UPDATED: Renders rider_id explicitly inside display layout views
+        // Renders rider_id inside display layout views
         function renderRiders(ridersList) {
             const listContainer = document.getElementById('ridersContainer');
             if (ridersList.length === 0) {
@@ -296,7 +295,7 @@
             `).join('');
         }
 
-        // --- ⚡ FIXED: SEARCH FILTER MATCHING EXACT RIDER_ID ---
+        // --- SEARCH FILTER MATCHING EXACT RIDER_ID ---
         function filterRidersList() {
             const query = document.getElementById('riderSearch').value.toLowerCase().trim();
             if (!query) {
@@ -319,22 +318,22 @@
             activeTargetOrderId = null;
         }
 
-        // --- ⚡ FIXED: EXECUTE ASSIGNMENT PIPELINE UPDATING RIDER_ID AND TIMESTAMP ---
+        // --- ⚡ FIXED & OLYMPIAN UPDATE: STATUS SHIFTED TO 'assigned' & TIMESTAMP MAPS PERFECTLY ---
         async function executeRiderAssignment(riderId, riderPhone) {
             if (!activeTargetOrderId) return;
             
-            // Format precise current timestamp structure requested: YYYY-MM-DD HH:mm:ss
+            // Matches exact format: YYYY-MM-DD HH:mm:ss.SSS+00
             const currentDate = new Date();
-            const formattedAssignedAt = currentDate.toISOString().replace('T', ' ').substring(0, 19) + '+00';
+            const formattedAssignedAt = currentDate.toISOString().replace('T', ' ').replace('Z', '+00');
 
             try {
-                // Perfect update payload pipeline mapped exactly to your tables configuration
+                // ⚡ status value shifted from 'pending' to 'assigned' so it unlocks instantly inside Rider Application
                 const { error } = await _supabase
                     .from('orders')
                     .update({
                         rider_id: riderId, 
                         rider_phone: riderPhone,
-                        status: 'pending', 
+                        status: 'assigned', // Status ab perfect 'assigned' update hoga!
                         rider_status: 'Assigned',
                         assigned_at: formattedAssignedAt, 
                         updated_at: new Date().toISOString()
@@ -343,7 +342,7 @@
 
                 if (error) throw error;
 
-                alert("🚀 Order rider ko kamyabi se assign kar diya gaya hai!");
+                alert("🚀 Order rider ko kamyabi se assign kar diya gaya hai aur status 'assigned' ho chuka hai!");
                 closeRiderModal();
                 loadPendingOrders();
 
