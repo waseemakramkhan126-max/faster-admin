@@ -1,764 +1,3 @@
-
-Gemini
-New chat
-Search chats
-Videos
-New
-Library
-New notebook
-Webpage Code Se Dashboard Banayein
-Button Visibility and Layout Adjustment
-Supabase Table/Column Delete Guide
-Supabase RLS Policy for Uploads
-Server Error Troubleshooting Guide
-Time Save Karne Ka Solution
-Picture Ka Size 2732x2732 Karein
-A Simple Greeting Exchange
-Time Logic Fix for Order Placement
-Supabase Admin Settings Code
-Project Progress & Next Steps
-AI Reply Not Working: Fixes
-Code Review: Architecture & AI Integration
-Order Summary Data Storage Query
-Footer Transparency Issue Resolution
-Code Refactoring and File Division
-Database Schema Explanation
-AI as Your Personal Study Partner
-Gemini Se Behtar Code Kaise Lein
-Gemini Pro Subscription Canceled, Resubscribe
-Google Login Bypass Code Update
-App Files Aur New Feature Discussion
-Professional App Color Combination
-Greeting and Offer of Assistance
-Conversation with Gemini
-me apko ek webpage ka code send krta hu
-
-*( pir ham waisa hi APNA dashboard bnaygy )*
-
-ab mujy ye btao us page PE right click kr k kia kia cheez apko dikhao..?
-
-Zabardast! Ek behtareen dashboard banane ke liye aapko us webpage se yeh cheezein nikal kar mujhe deni hongi:
-
-1. Main HTML Structure (Inspect Element):
-Webpage pe right-click karein aur "Inspect" (ya "Inspect Element") par click karein. Aapke pas ek "Elements" tab khulega. Wahan jo sabse main wrapper ya container hai (jaise <div id="root">, <main>, ya <body>), us par right-click karein. Phir "Copy" -> "Copy element" (ya "Copy outerHTML") select karein aur mujhe bhej dein. Is se mujhe us page ka pura layout, cards, aur grid ka structure mil jayega.
-
-2. Styling aur CSS Classes:
-Agar us webpage pe Tailwind CSS use hui hai, toh classes HTML ke andar hi mojood hongi jo Inspect Element se mil jayengi. Agar unhone custom CSS use ki hai, toh Inspect panel me <head> tag ke andar jo <style> tags ya CSS links hain, wo copy kar ke de dein.
-
-Jab hum apna dashboard banayenge, toh hum CSS variables setup karenge jisme colors ki jagah unke names aur percentages (%) likhenge taake aap easily apne hisaab se unhe change kar sakein. Hum isko waisi hi clean, transparent aur professional look denge.
-
-3. SVG Icons (Agar zaroorat ho):
-Agar dashboard me kuch khaas icons hain jo aapko pasand hain, toh un icons pe right-click kar ke "Inspect" karein aur unka <svg>...</svg> wala code copy kar lein.
-
-4. View Page Source (Optional):
-Aap page pe right-click kar ke "View Page Source" se bhi code copy kar sakte hain. Lekin agar wo page kisi modern framework (jaise React/Next.js) pe bana hai, toh "Inspect" wala tarika sabse best aur accurate result dega.
-
-Aap bas us dashboard ke main hissay (sidebar, header, aur main content area) ka HTML code copy kar ke mujhe bhejein, hum usay apne secure admin panel ke hisaab se build karna shuru karte hain!
-
-code to bht lamba likha huwa hai kuch to mene html wali file me add kr diya hai aur kuch ki alag files bnai hai
-
-me send krta hu
-
-Koi masla nahi! Aap aaram se code send karein.
-
-Kyunke code lamba hai, isliye files ko alag alag karna ek acha faisla hai. Jab aap code bhejenge, toh hum usay step-by-step apne dashboard ke hisaab se dhal lenge.
-
-Aap is tarah send kar sakte hain:
-
-Pehle step mein: Sirf apni HTML file ka code bhej dein, taake main structure aur layout samajh saku.
-
-Dusre step mein: Jo alag files aapne banayi hain (CSS ya JavaScript), wo bhej dijiyega.
-
-Hum is code ko clean kar ke apne Faster admin panel ke environment ke mutabiq set kar lenge. Sath hi CSS variables bhi wese hi set kar denge jisme colors ke names aur percentages (%) hon, taake future me aap manually asani se colors change kar sakein.
-
-Aap pehle sirf layout ka code bhejna pasand karenge, ya main pehle aapki CSS styling dekhun?
-
-Mene apka html.html wala code dekh liya hai. Is file me zyada tar bunyadi structure aur fonts (jaise Google Sans aur Inter) mojood hain. Asal dashboard ka design aur components shayed un baqi files me hain jo aapne alag ki hain kyunke isme sirf <div id="root"></div> mojood hai jahan main app load hoti hai.
-
-Aap apni baqi files bhi aaram se bhej dein. Hum is dashboard ko apne secure Supabase admin panel ke mutabiq set kar lenge. Sath hi, CSS variables ka setup bhi wese hi karenge jisme colors ke naam aur percentages (%) hon, taake baad me colors ko manually change karna apke liye bilkul asan ho.
-
-Main apke baqi code ka intezar kar raha hu, phir hum isko properly build karna shuru karte hain!
-
-Your uploads may be too large for the best results. Learn moreOpens in a new window
-Mene aapki bheji hui sab files dekh li hain. Isme jo index-PMcXJFie.css hai, us se humein fonts aur base styling ka kafi idea mil jayega. Baqi jo JavaScript files aapne bheji hain (jaise map.js, geometry.js, places_impl.js, waghera), wo asal me Google Maps API ki minified script files hain.
-
-Jo pichli HTML file thi, usme ek main script ka link tha: index-DfSv5POE.js. Asal dashboard ka layout (sidebar, header, content cards) usi ek file ke andar compiled hoga jo shayad aap se miss ho gayi hai.
-
-Lekin isme pareshani ki koi baat nahi! Hum seedha apne environment ke liye ek behtareen dashboard ka structure khud khara kar sakte hain. Hum isko ek clean, premium fintech look denge, jisme glassmorphism, transparent footers aur smooth UI elements shamil honge—bilkul Apple Wallet ya Revolut jaisi professional vibe.
-
-Styling ke liye main direct proper CSS variables ka structure bana dunga jisme colors ke names aur percentages (%) define hongi. Is tarah aap apne primary colors (jaise #0077b9) ya background shades ko easily sirf naam aur % change kar ke manually adjust kar sakenge.
-
-Aap batayein, kya aap wo main index-xxxx.js file dhoond kar Inspect Element se send karna chahenge, ya phir main abhi se ek naya transparent aur modern admin panel layout code karna shuru karun?
-
-Mil gayi file! Jo index-DfSv5POE.js aapne bheji hai, yehi asal khazana hai. Is file ke andar unhone pura React ka structure aur routing likhi hui hai, jisme mujhe dashboard ke alag alag pages nazar aa rahe hain (jaise /admin/topup-requests, /admin/payout-requests, aur allowedRoles: ["super-admin"] waghera).
-
-Chunke ye code compile aur minify ho chuka hai, is wajah se isme se seedha HTML nikal kar copy-paste karna thora mushkil hota hai. Lekin humein is se is panel ke flow aur pages ka pura idea mil gaya hai! Baqi jo files hain (jaise places.js, util.js) wo zyada tar Google Maps API aur background scripts ka hissa hain.
-
-Ab hum apne Faster admin panel ke liye bilkul fresh aur secure layout khud code kar lete hain. Main isko ek clean, modern fintech look dunga jisme glassmorphism aur transparent elements shamil honge. Sath hi, CSS variables ka setup bilkul wese hi karunga:
-
-CSS
-:root {
-  --primary-blue: 0 119 185; /* #0077b9 ka RGB jise hum % ke sath use karenge */
-  --bg-transparent: rgba(255, 255, 255, 10%); /* Percent based colors */
-}
-Is tarah aap sirf naam aur percent (%) likh kar pure dashboard ke colors easily change kar sakenge.
-
-Kya hum is naye admin panel ka frontend React/Next.js mein setup karein, ya aap chahte hain ke main plain HTML/CSS aur Vanilla JS likhun jo direct aapke Supabase backend ke sath connect ho jaye?
-
-glassmorphism me NAHI banana balky same aisa hi banana hai
-
-Zabardast, samajh gaya! Glassmorphism aur transparent elements ko bilkul cancel karte hain. Hum 100% wahi exact design, colors, aur layout banayenge jo us original panel ka hai. Bilkul same to same clone tayar karenge.
-
-Chunke wo original file React mein thi, toh kya hum apna ye exact clone bhi React (ya Next.js) mein banana shuru karein, ya aap chahte hain ke main ise plain HTML/CSS aur Vanilla JS mein likhun?
-
-ab me apne dashboard kia code send krta hu
-
-USME KOI B LOGIC FUNCTIONS kharab NAHI krna bas new futures add krne hai
-
-Bilkul theek hai. Aap apna code aaram se send karein.
-
-Main is baat ka pura khayal rakhunga ke aapke likhe hue kisi bhi logic, API calls, ya function me koi tabdeeli na aaye. Jo code pehle se theek chal raha hai, wo bilkul wese hi kaam karega. Hum sirf naye features ka code usme shamil karenge.
-
-Sath hi hum UI ko bilkul wahi exact solid design denge jo original panel ka hai, aur colors ko CSS variables me names aur percent (%) ke sath define kar denge taake baad me manual adjustment aapke liye asan ho.
-
-Aap code bhej dein aur bata dein ke isme ab kon kon se naye features add karne hain. Phir hum foran kaam shuru karte hain!
-
-<!DOCTYPE html>
-
-<html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Faster Admin - Clean Main Dashboard</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <style>
-
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-        
-
-        body { 
-
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-
-            background-color: #f8fafc; 
-
-            color: #334155; 
-
-            overflow: hidden; 
-
-        }
-
-
-
-        /* RESPONSIVE SIDEBAR MAGIC */
-
-        @media (min-width: 768px) {
-
-            .sidebar {
-
-                width: 68px; /* Width kam ki taake minimalist lage */
-
-                transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-            }
-
-            .sidebar:hover {
-
-                width: 240px; 
-
-            }
-
-            .nav-text {
-
-                opacity: 0;
-
-                transform: translateX(-10px);
-
-                transition: all 0.2s ease;
-
-                white-space: nowrap;
-
-            }
-
-            .sidebar:hover .nav-text {
-
-                opacity: 1;
-
-                transform: translateX(0);
-
-            }
-
-        }
-
-        
-
-        @media (max-width: 767px) {
-
-            .sidebar {
-
-                width: 240px;
-
-                position: fixed;
-
-                top: 0;
-
-                left: 0;
-
-                transform: translateX(-100%);
-
-                transition: transform 0.25s ease-in-out;
-
-                z-index: 50;
-
-            }
-
-            .sidebar.open {
-
-                transform: translateX(0);
-
-            }
-
-            .nav-text {
-
-                opacity: 1; 
-
-                transform: translateX(0);
-
-                white-space: nowrap;
-
-            }
-
-        }
-
-
-
-        .overlay {
-
-            display: none;
-
-            position: fixed;
-
-            inset: 0;
-
-            background: rgba(15, 23, 42, 0.4);
-
-            backdrop-filter: blur(1px);
-
-            z-index: 40;
-
-            opacity: 0;
-
-            transition: opacity 0.25s ease;
-
-        }
-
-        .overlay.show {
-
-            display: block;
-
-            opacity: 1;
-
-        }
-
-    </style>
-
-</head>
-
-<body class="flex h-screen w-full relative bg-slate-50">
-
-
-
-    <div id="mobileOverlay" class="overlay md:hidden"></div>
-
-
-
-    <aside id="sidebar" class="sidebar bg-white border-r border-gray-200 h-full flex flex-col group shrink-0">
-
-        
-
-        <div class="h-14 flex items-center px-5 border-b border-gray-200 shrink-0 relative">
-
-            <div class="w-7 h-7 rounded-md bg-slate-800 flex items-center justify-center shrink-0">
-
-                <i class="fas fa-bolt text-white text-xs"></i>
-
-            </div>
-
-            <h1 class="nav-text text-sm font-bold text-slate-800 tracking-wide ml-3">Faster<span class="text-emerald-600 font-black">Admin</span></h1>
-
-            
-
-            <button id="closeSidebarBtn" class="md:hidden absolute right-4 text-slate-400 hover:text-slate-800">
-
-                <i class="fas fa-times text-lg"></i>
-
-            </button>
-
-        </div>
-
-
-
-        <nav class="flex-1 overflow-y-auto py-4 space-y-0.5 overflow-x-hidden">
-
-            <a href="dashboard.html" class="nav-item flex items-center px-5 py-2.5 text-emerald-700 bg-emerald-50 border-r-4 border-emerald-600">
-
-                <i class="nav-icon fas fa-chart-pie w-6 text-center text-base shrink-0"></i>
-
-                <span class="nav-text font-semibold text-xs tracking-wide ml-3">Dashboard</span>
-
-            </a>
-
-
-
-            <a href="promo-dashboard.html" class="nav-item flex items-center px-5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors border-r-4 border-transparent hover:border-slate-300">
-
-                <i class="nav-icon fas fa-ad w-6 text-center text-base shrink-0"></i>
-
-                <span class="nav-text font-medium text-xs tracking-wide ml-3 flex items-center justify-between w-full">
-
-                    Promotions
-
-                    <span class="bg-emerald-100 text-emerald-700 text-[8px] font-bold px-1.5 py-0.5 rounded ml-2">READY</span>
-
-                </span>
-
-            </a>
-
-
-
-            <a href="settings.html" class="nav-item flex items-center px-5 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors border-r-4 border-transparent hover:border-slate-300">
-
-                <i class="nav-icon fas fa-cogs w-6 text-center text-base shrink-0"></i>
-
-                <span class="nav-text font-medium text-xs tracking-wide ml-3">Settings</span>
-
-            </a>
-
-        </nav>
-
-
-
-        <div class="p-3 border-t border-gray-200">
-
-            <a href="#" class="nav-item flex items-center px-2 py-2 text-red-600 hover:bg-red-50 rounded transition-colors">
-
-                <i class="fas fa-sign-out-alt w-6 text-center text-sm shrink-0"></i>
-
-                <span class="nav-text font-semibold text-xs tracking-wide ml-3">Log Out</span>
-
-            </a>
-
-        </div>
-
-    </aside>
-
-
-
-    <main class="flex-1 flex flex-col h-full min-w-0 relative">
-
-        
-
-        <header class="h-14 px-4 md:px-6 flex justify-between items-center border-b border-gray-200 bg-white shrink-0">
-
-            <div class="flex items-center gap-3">
-
-                <button id="openMobileMenu" class="md:hidden text-slate-600 hover:text-emerald-600 focus:outline-none bg-slate-100 p-1.5 rounded-md">
-
-                    <i class="fas fa-bars text-base"></i>
-
-                </button>
-
-                <h2 class="text-slate-800 font-bold text-sm md:text-base tracking-wide">System Hub</h2>
-
-            </div>
-
-
-
-            <div class="flex items-center gap-4">
-
-                <div class="text-right border-r border-gray-200 pr-4">
-
-                    <p class="text-xs font-bold text-slate-800" id="liveTime">00:00:00</p>
-
-                    <p class="text-[9px] text-emerald-600 font-semibold uppercase tracking-wider">Live Connect</p>
-
-                </div>
-
-                <div class="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-slate-50 cursor-pointer transition-colors">
-
-                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></div>
-
-                    <span class="text-xs font-semibold text-slate-700 hidden sm:block">Waseem Akram</span>
-
-                </div>
-
-            </div>
-
-            <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-        </header>
-
-
-
-        <div id="mainDashboardArea" class="flex-1 p-4 md:p-6 overflow-y-auto">
-
-            
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-
-                
-
-                <a href="order-management.html" class="w-full bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
-
-                    <div class="w-8 h-8 rounded-md bg-indigo-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors">
-
-                        <i class="fas fa-clipboard-list text-indigo-500 group-hover:text-white text-sm transition-colors"></i>
-
-                    </div>
-
-                    <h3 class="text-slate-800 font-bold text-xs tracking-wide group-hover:text-white transition-colors">Order Management</h3>
-
-                    <p class="text-[11px] text-slate-500 mt-1 leading-normal group-hover:text-emerald-50 transition-colors">
-
-                        Control, Track & Manage orders.
-
-                    </p>
-
-                </a>
-
-
-
-                <a href="admin-topups.html" class="relative w-full bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
-
-                    <div class="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors relative inline-flex">
-
-                        <i class="fas fa-wallet text-blue-500 group-hover:text-white text-sm transition-colors"></i>
-
-                        
-
-                        <span id="topupBadge" class="hidden absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full border border-white z-10 shadow-sm">
-
-                            0
-
-                        </span>
-
-                    </div>
-
-                    <h3 class="text-slate-800 font-bold text-xs tracking-wide group-hover:text-white transition-colors">Top-Up Wallet</h3>
-
-                    <p class="text-[11px] text-slate-500 mt-1 leading-normal group-hover:text-emerald-50 transition-colors">
-
-                        Control & track wallet topup requests.
-
-                    </p>
-
-                </a>
-
-
-
-                <a href="withdraw-requests.html" class="relative w-full bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
-
-                    <div class="w-8 h-8 rounded-md bg-orange-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors relative inline-flex">
-
-                        <i class="fas fa-arrow-up text-orange-500 group-hover:text-white text-sm transition-colors"></i>
-
-                        
-
-                        <span id="withdrawBadge" class="hidden absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full border border-white z-10 shadow-sm">
-
-                            0
-
-                        </span>
-
-                    </div>
-
-                    <h3 class="text-slate-800 font-bold text-xs tracking-wide group-hover:text-white transition-colors">Withdraw</h3>
-
-                    <p class="text-[11px] text-slate-500 mt-1 leading-normal group-hover:text-emerald-50 transition-colors">
-
-                        Control & track wallet withdraw requests.
-
-                    </p>
-
-                </a>
-
-
-
-                <a href="wallets-control.html" class="relative w-full bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:bg-emerald-600 hover:border-emerald-600 transition-all duration-200 group flex flex-col cursor-pointer">
-
-                    <div class="w-8 h-8 rounded-md bg-purple-50 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-colors relative inline-flex">
-
-                        <i class="fas fa-chart-line text-purple-500 group-hover:text-white text-sm transition-colors"></i>
-
-                    </div>
-
-                    <h3 class="text-slate-800 font-bold text-xs tracking-wide group-hover:text-white transition-colors">Financial Details</h3>
-
-                    <p class="text-[11px] text-slate-500 mt-1 leading-normal group-hover:text-emerald-50 transition-colors">
-
-                        Transactions and balance history.
-
-                    </p>
-
-                </a>
-
-
-
-            </div>
-
-        </div>
-
-    </main>
-
-
-
-    <script>
-
-        const sidebar = document.getElementById('sidebar');
-
-        const overlay = document.getElementById('mobileOverlay');
-
-        const openBtn = document.getElementById('openMobileMenu');
-
-        const closeBtn = document.getElementById('closeSidebarBtn');
-
-
-
-        function toggleSidebar() {
-
-            sidebar.classList.toggle('open');
-
-            overlay.classList.toggle('show');
-
-        }
-
-
-
-        openBtn.addEventListener('click', toggleSidebar);
-
-        closeBtn.addEventListener('click', toggleSidebar);
-
-        overlay.addEventListener('click', toggleSidebar);
-
-    </script>
-
-
-
-    <script>
-
-        function updateTime() {
-
-            const now = new Date();
-
-            let hours = now.getHours();
-
-            let minutes = now.getMinutes();
-
-            let seconds = now.getSeconds();
-
-            let ampm = hours >= 12 ? 'PM' : 'AM';
-
-            hours = hours % 12;
-
-            hours = hours ? hours : 12; 
-
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-
-            seconds = seconds < 10 ? '0' + seconds : seconds;
-
-            document.getElementById('liveTime').innerText = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-
-        }
-
-        
-
-        const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
-
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
-
-        const _supabase = supabase.createClient(SB_URL, SB_KEY);
-
-
-
-        async function fetchPendingTopupsCount() {
-
-            try {
-
-                const { count, error } = await _supabase
-
-                    .from('topup_requests')
-
-                    .select('*', { count: 'exact', head: true })
-
-                    .eq('status', 'pending');
-
-                
-
-                if (error) throw error;
-
-                
-
-                const badge = document.getElementById('topupBadge');
-
-                if (count > 0) {
-
-                    badge.innerText = count > 99 ? '99+' : count; 
-
-                    badge.classList.remove('hidden'); 
-
-                } else {
-
-                    badge.classList.add('hidden'); 
-
-                }
-
-            } catch (err) {
-
-                console.error("Error fetching topup count:", err);
-
-            }
-
-        }
-
-
-
-        async function updateWithdrawBadgeCount() {
-
-            try {
-
-                const { count, error } = await _supabase
-
-                    .from('withdraw_requests')
-
-                    .select('*', { count: 'exact', head: true })
-
-                    .eq('status', 'pending');
-
-
-
-                const badge = document.getElementById('withdrawBadge');
-
-                if (badge) {
-
-                    if (!error && count > 0) {
-
-                        badge.innerText = count;
-
-                        badge.classList.remove('hidden');
-
-                    } else {
-
-                        badge.classList.add('hidden');
-
-                    }
-
-                }
-
-            } catch (err) {
-
-                console.error("Withdraw badge error: ", err);
-
-            }
-
-        }
-
-
-
-        function setupDashboardRealtime() {
-
-            _supabase.channel('dashboard-live-badge')
-
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'withdraw_requests' }, () => {
-
-                    updateWithdrawBadgeCount(); 
-
-                }).subscribe();
-
-        }
-
-
-
-        function setupTopupListener() {
-
-            _supabase.channel('dashboard-topup-badge')
-
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'topup_requests' }, () => {
-
-                    fetchPendingTopupsCount(); 
-
-                })
-
-                .subscribe();
-
-        }
-
-
-
-        window.addEventListener('load', () => {
-
-            if (typeof fetchPendingTopupsCount === 'function') fetchPendingTopupsCount();
-
-            setupTopupListener();
-
-            updateWithdrawBadgeCount();
-
-            setupDashboardRealtime();
-
-        });
-
-
-
-        setInterval(updateTime, 1000);
-
-        updateTime();
-
-    </script>
-
-</body>
-
-</html>
-
-Zabardast! Mene apka Faster Admin dashboard ka code apne pas load kar liya hai.
-
-Apki Supabase ki realtime logic (top-up aur withdraw badges), sidebar animations, aur live time functions bilkul waise hi mehfooz hain. Inme koi tabdeeli nahi ki jayegi aur sab kuch perfectly pehle ki tarah kaam karega.
-
-Sath hi, styling ke liye CSS variables ka setup bhi ready kar liya gaya hai taake naye design mein hum seedha color ke naam aur unki percentage (%) use karein, jisse colors ko manually control aur change karna apke liye bilkul asan ho jayega.
-
-Ab aap mujhe batayein ke is dashboard mein kon kon se naye features add karne hain? (Jaise koi naye menu items, naye cards, statistics/charts, ya koi naya section?) Aap bas features batayein, main is code mein add kar ke apko final code deta hu.
-
-abi filhal Jo already Hain unko hi rehne do sirf style aur design multitasker Wala bna do baki Jo cheeze add krni Hain wo me bad me batata hu
-
-Your HTML file is ready
-HTML icon
- dashboard 
- HTML 
-
-Mene apka code update kar diya hai. Jo bhi logic apko pehle se likhi hui thi (jaise apka live time, Waseem Akram wali profile tag, Supabase realtime connections, aur topup/withdraw notification badges) wo sab 100% same wese hi mehfooz hain, inme koi changes nahi kiye gaye.
-
-Sirf iska design ab completely us premium "multitasker" app jesa solid aur clean kar diya gaya hai. Glassmorphism khatm kar diya gaya hai aur iski jagah:
-
-Solid Premium Cards add kar diye hain jo hover karne par us exact module ke rang mein highlight hote hain.
-
-<style> tag ke sabse upar CSS Variables (:root) bana diye hain. Colors ab rgb format (jaise 0, 119, 185) aur solid opacities mein set hain taake aap kal ko agar main theme color badalna chahein toh sirf 1 line change karne se pura system update ho jaye.
-
-Sidebar aur Header ko pehle se ziada clean aur professional alignment de di gayi hai.
-
-Aap is HTML file ko run kar ke check kar lein. Jab aap tasalli kar lein ke layout bilkul theek aur professional lag raha hai, toh phir mujhe batayein ke isme naye features aur naye buttons konsi jagah add karne hain!
-
-
-
-
-Gemini is AI and can make mistakes.
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -874,13 +113,10 @@ Gemini is AI and can make mistakes.
 </head>
 <body class="flex h-screen w-full relative">
 
-    <!-- Mobile Sidebar Overlay -->
     <div id="mobileOverlay" class="overlay md:hidden"></div>
 
-    <!-- Sidebar Panel (Solid Multitasker Structure) -->
     <aside id="sidebar" class="sidebar bg-white border-r border-slate-200 h-full flex flex-col group shrink-0 z-30 shadow-sm">
         
-        <!-- Header / Logo Section -->
         <div class="h-16 flex items-center px-5 border-b border-slate-100 shrink-0 relative justify-between md:justify-start">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center shrink-0 shadow-sm">
@@ -896,7 +132,6 @@ Gemini is AI and can make mistakes.
             </button>
         </div>
 
-        <!-- Navigation Menu -->
         <nav class="flex-1 overflow-y-auto py-6 space-y-1 overflow-x-hidden px-3">
             <a href="dashboard.html" class="nav-item flex items-center px-3 py-3 rounded-lg active-nav transition-all duration-150">
                 <i class="nav-icon fas fa-chart-pie w-6 text-center text-lg shrink-0"></i>
@@ -917,7 +152,6 @@ Gemini is AI and can make mistakes.
             </a>
         </nav>
 
-        <!-- Logout Section -->
         <div class="p-4 border-t border-slate-100">
             <a href="#" class="nav-item flex items-center px-3 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                 <i class="fas fa-sign-out-alt w-6 text-center text-base shrink-0"></i>
@@ -926,10 +160,8 @@ Gemini is AI and can make mistakes.
         </div>
     </aside>
 
-    <!-- Main Dynamic Content Container -->
     <main class="flex-1 flex flex-col h-full min-w-0 relative bg-slate-50">
         
-        <!-- Premium Solid Top Navbar -->
         <header class="h-16 px-6 flex justify-between items-center border-b border-slate-200 bg-white shrink-0 shadow-sm z-20">
             <div class="flex items-center gap-4">
                 <button id="openMobileMenu" class="md:hidden text-slate-600 hover:text-sky-600 focus:outline-none bg-slate-100 p-2 rounded-lg transition-colors">
@@ -942,7 +174,6 @@ Gemini is AI and can make mistakes.
                 <h2 class="text-slate-800 font-bold text-sm tracking-wide sm:hidden">System Hub</h2>
             </div>
 
-            <!-- Live Status & Admin Profile Elements -->
             <div class="flex items-center gap-5">
                 <div class="text-right border-r border-slate-200 pr-5 py-1">
                     <p class="text-sm font-black text-slate-800 font-mono tracking-tight" id="liveTime">00:00:00</p>
@@ -957,16 +188,13 @@ Gemini is AI and can make mistakes.
                 </div>
             </div>
             
-            <!-- Supabase Base Engine Client CDN Injector -->
             <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         </header>
 
-        <!-- Main Workspace Area Grid Setup -->
         <div id="mainDashboardArea" class="flex-1 p-6 md:p-8 overflow-y-auto">
             
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 
-                <!-- Card 1: Order Management Link Layout -->
                 <a href="order-management.html" class="premium-card rounded-xl p-5 shadow-sm flex flex-col cursor-pointer group">
                     <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center mb-4 border border-sky-100 transition-colors group-hover:bg-sky-600">
                         <i class="fas fa-clipboard-list text-sky-600 group-hover:text-white text-base transition-colors"></i>
@@ -981,12 +209,10 @@ Gemini is AI and can make mistakes.
                     </div>
                 </a>
 
-                <!-- Card 2: Top-Up Wallet Node with Live Notification Counter -->
                 <a href="admin-topups.html" class="premium-card relative rounded-xl p-5 shadow-sm flex flex-col cursor-pointer group">
                     <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-4 border border-emerald-100 transition-colors group-hover:bg-emerald-600 relative inline-flex">
                         <i class="fas fa-wallet text-emerald-600 group-hover:text-white text-base transition-colors"></i>
                         
-                        <!-- Notification Counter Node -->
                         <span id="topupBadge" class="hidden absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[10px] font-black min-w-[18px] h-4.5 px-1 flex items-center justify-center rounded-full border-2 border-white z-10 shadow-md animate-bounce">
                             0
                         </span>
@@ -1001,12 +227,10 @@ Gemini is AI and can make mistakes.
                     </div>
                 </a>
 
-                <!-- Card 3: Withdraw Process Handler System Node -->
                 <a href="withdraw-requests.html" class="premium-card relative rounded-xl p-5 shadow-sm flex flex-col cursor-pointer group">
                     <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-4 border border-amber-100 transition-colors group-hover:bg-amber-600 relative inline-flex">
                         <i class="fas fa-arrow-up text-amber-500 group-hover:text-white text-base transition-colors"></i>
                         
-                        <!-- Live Realtime Badge Counter -->
                         <span id="withdrawBadge" class="hidden absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[10px] font-black min-w-[18px] h-4.5 px-1 flex items-center justify-center rounded-full border-2 border-white z-10 shadow-md animate-bounce">
                             0
                         </span>
@@ -1021,7 +245,6 @@ Gemini is AI and can make mistakes.
                     </div>
                 </a>
 
-                <!-- Card 4: Financial Metrics Analysis Hub -->
                 <a href="wallets-control.html" class="premium-card relative rounded-xl p-5 shadow-sm flex flex-col cursor-pointer group">
                     <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center mb-4 border border-violet-100 transition-colors group-hover:bg-violet-600 relative inline-flex">
                         <i class="fas fa-chart-line text-violet-600 group-hover:text-white text-base transition-colors"></i>
@@ -1040,7 +263,6 @@ Gemini is AI and can make mistakes.
         </div>
     </main>
 
-    <!-- Navigation Control Script Logic Blocks -->
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('mobileOverlay');
@@ -1057,7 +279,6 @@ Gemini is AI and can make mistakes.
         overlay.addEventListener('click', toggleSidebar);
     </script>
 
-    <!-- Core Database & Functional Engine Code Script Blocks -->
     <script>
         function updateTime() {
             const now = new Date();
@@ -1145,5 +366,3 @@ Gemini is AI and can make mistakes.
     </script>
 </body>
 </html>
-dashboard.html
-Details panel collapsed.
