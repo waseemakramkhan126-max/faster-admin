@@ -22,12 +22,16 @@
         .custom-scroll::-webkit-scrollbar { width: 5px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Hide horizontal scrollbar for clean premium navbar design */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-4 sm:p-6">
 
-    <header class="max-w-6xl mx-auto w-full flex flex-col sm:flex-row justify-between items-center border-b border-slate-200 pb-5 mb-6 gap-4">
-        <div class="flex items-center gap-4 w-full sm:w-auto">
+    <header class="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-center border-b border-slate-200 pb-5 mb-6 gap-4">
+        <div class="flex items-center gap-4 w-full lg:w-auto shrink-0">
             <button onclick="location.href='order-management.html'" class="w-10 h-10 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition-all shadow-sm active:scale-95">
                 <i class="fas fa-chevron-left text-sm"></i>
             </button>
@@ -36,18 +40,57 @@
                     <i class="fas fa-clock text-lg animate-pulse"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-black text-slate-800 tracking-tight uppercase">Incoming Pending Gateway</h1>
-                    <p class="text-xs text-slate-500 font-medium">Live control matrix for newly received order queues</p>
+                    <h1 class="text-lg font-black text-slate-800 tracking-tight uppercase">Incoming Pending Gateway</h1>
+                    <p class="text-[11px] text-slate-500 font-medium">Live control matrix for order queues</p>
                 </div>
             </div>
         </div>
-        <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 shadow-sm self-end sm:self-auto">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            <span>Live Sync Active</span>
+
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto justify-between flex-1 lg:pl-6">
+            <nav class="flex items-center gap-2 overflow-x-auto whitespace-nowrap hide-scrollbar flex-1 w-full sm:w-auto text-xs font-bold">
+                <a href="dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                
+                <div class="relative group py-2">
+                    <button class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                    <div class="absolute top-full left-0 mt-0 w-48 bg-white border border-slate-100 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <a href="add-order.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-t-lg">Add New Order</a>
+                        <a href="add-rider.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white">Add New Rider</a>
+                        <a href="announcement.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-b-lg">Announcement</a>
+                    </div>
+                </div>
+
+                <a href="shops.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Shops</a>
+                
+                <a href="admin-topups.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+                    <span>Top-up</span>
+                    <span id="badgeTopup" class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+                
+                <a href="withdraw-requests.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+                    <span>Payout</span>
+                    <span id="badgePayout" class="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+                
+                <a href="reports.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Reports</a>
+                
+                <a href="financials.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                    <i class="fas fa-chart-line text-xs"></i> Financials
+                </a>
+
+                <a href="settings.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Settings</a>
+            </nav>
+            
+            <div class="text-[10px] font-bold text-emerald-500 uppercase flex items-center gap-1 bg-emerald-50 px-2.5 py-1.5 rounded-md border border-emerald-200 shrink-0 self-end sm:self-auto">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live
+            </div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto w-full flex-1">
+    <main class="max-w-7xl mx-auto w-full flex-1">
         <div id="mainLoader" class="flex flex-col items-center justify-center py-24 opacity-60">
             <i class="fas fa-circle-notch animate-spin text-3xl text-orange-500 mb-3"></i>
             <p class="text-xs font-bold uppercase tracking-widest text-slate-600">Syncing Pending Matrix...</p>
@@ -96,7 +139,7 @@
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
         let activeTargetOrderId = null;
-        let globalRidersArray = []; // Local cache for real-time search filtering
+        let globalRidersArray = []; // Caching global records securely
 
         // --- FETCH & LOAD PENDING ORDERS ---
         async function loadPendingOrders() {
@@ -129,7 +172,6 @@
 
                     return `
                         <div class="premium-card rounded-2xl p-3 sm:px-5 sm:py-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative group w-full">
-                            
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400 mb-1">
                                     <span class="text-slate-800 font-black">ID: #${order.id.toString().slice(-6).toUpperCase()}</span>
@@ -171,7 +213,6 @@
 
             } catch (err) {
                 console.error("Fetch Error:", err);
-                document.getElementById('ordersList').innerHTML = `<div class="col-span-full py-12 text-center text-red-500 font-bold text-xs uppercase tracking-wider">Failed to sync pending data matrix.</div>`;
             }
         }
 
@@ -198,7 +239,6 @@
                 if (error) throw error;
                 alert("✅ Order kamyabi se cancel kar diya gaya hai.");
                 loadPendingOrders();
-
             } catch (err) {
                 alert("❌ Operation Fail: " + err.message);
             }
@@ -215,7 +255,8 @@
             listContainer.innerHTML = `<div class="text-center py-10 opacity-60"><i class="fas fa-circle-notch animate-spin text-lg mb-1 text-slate-600"></i><p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Loading Riders...</p></div>`;
 
             try {
-                const { data: riders, error } = await _supabase.from('riders').select('*').order('id', { ascending: true });
+                // ⚡ Fetching explicitly sorting data by rider_id column
+                const { data: riders, error } = await _supabase.from('riders').select('*').order('rider_id', { ascending: true });
                 if (error) throw error;
 
                 globalRidersArray = riders || []; 
@@ -226,7 +267,7 @@
             }
         }
 
-        // ⚡ UPDATED: Displays Rider ID cleanly inside list row
+        // ⚡ UPDATED: Renders rider_id explicitly inside display layout views
         function renderRiders(ridersList) {
             const listContainer = document.getElementById('ridersContainer');
             if (ridersList.length === 0) {
@@ -237,25 +278,25 @@
             listContainer.innerHTML = ridersList.map(rider => `
                 <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between gap-4 hover:border-slate-200 transition-all">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs uppercase">
-                            ${rider.id}
+                        <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center font-black text-emerald-600 text-xs">
+                            ${rider.rider_id || 'R'}
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
                                 <h4 class="text-slate-800 font-bold text-xs tracking-tight">${rider.name || 'Unnamed Rider'}</h4>
-                                <span class="bg-blue-50 text-blue-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-blue-100">ID: ${rider.id}</span>
+                                <span class="bg-blue-50 text-blue-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-blue-100">ID: ${rider.rider_id}</span>
                             </div>
                             <p class="text-[10px] text-slate-500 font-bold mt-0.5"><i class="fas fa-phone mr-1 text-[8px] text-slate-400"></i>${rider.phone}</p>
                         </div>
                     </div>
-                    <button onclick="executeRiderAssignment(${rider.id}, '${rider.phone}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[9px] uppercase tracking-widest rounded-lg transition-all active:scale-95">
+                    <button onclick="executeRiderAssignment('${rider.rider_id}', '${rider.phone}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[9px] uppercase tracking-widest rounded-lg transition-all active:scale-95">
                         Select
                     </button>
                 </div>
             `).join('');
         }
 
-        // --- ⚡ UPDATED: LIVE SEARCH FILTER ENGINE FOR RIDERS (Filters by ID, Name, Phone) ---
+        // --- ⚡ FIXED: SEARCH FILTER MATCHING EXACT RIDER_ID ---
         function filterRidersList() {
             const query = document.getElementById('riderSearch').value.toLowerCase().trim();
             if (!query) {
@@ -264,7 +305,7 @@
             }
 
             const filtered = globalRidersArray.filter(rider => {
-                const idMatch = rider.id ? rider.id.toString().toLowerCase().includes(query) : false;
+                const idMatch = rider.rider_id ? rider.rider_id.toString().toLowerCase().includes(query) : false;
                 const nameMatch = rider.name ? rider.name.toLowerCase().includes(query) : false;
                 const phoneMatch = rider.phone ? rider.phone.includes(query) : false;
                 return idMatch || nameMatch || phoneMatch;
@@ -278,20 +319,24 @@
             activeTargetOrderId = null;
         }
 
-        // --- ⚡ UPDATED: EXECUTE RIDER ROUTING PIPELINE (Fixes rider_id & assigned_at) ---
+        // --- ⚡ FIXED: EXECUTE ASSIGNMENT PIPELINE UPDATING RIDER_ID AND TIMESTAMP ---
         async function executeRiderAssignment(riderId, riderPhone) {
             if (!activeTargetOrderId) return;
             
+            // Format precise current timestamp structure requested: YYYY-MM-DD HH:mm:ss
+            const currentDate = new Date();
+            const formattedAssignedAt = currentDate.toISOString().replace('T', ' ').substring(0, 19) + '+00';
+
             try {
-                // Now perfectly updates rider_id and assigned_at timestamps
+                // Perfect update payload pipeline mapped exactly to your tables configuration
                 const { error } = await _supabase
                     .from('orders')
                     .update({
                         rider_id: riderId, 
                         rider_phone: riderPhone,
-                        status: 'pending', // Retaining pending state so it stays in active loop pools
+                        status: 'pending', 
                         rider_status: 'Assigned',
-                        assigned_at: new Date().toISOString(), 
+                        assigned_at: formattedAssignedAt, 
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', activeTargetOrderId);
