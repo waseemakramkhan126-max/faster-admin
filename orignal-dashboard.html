@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faster Admin - Premium Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; overflow: hidden; }
+        
+        /* SCROLLBAR HIDING */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* SIDEBAR TRANSITIONS (DESKTOP) */
+        @media (min-width: 768px) {
+            .sidebar { width: 72px; transition: width 0.25s ease; }
+            .sidebar:hover { width: 256px; }
+            .nav-text { opacity: 0; transition: opacity 0.2s; }
+            .sidebar:hover .nav-text { opacity: 1; }
+        }
+
+        /* MOBILE SIDEBAR FIX */
+        @media (max-width: 767px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                transform: translateX(-100%);
+                transition: transform 0.25s ease-in-out;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+        
+        /* OVERLAY */
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 40; }
+        .overlay.show { display: block; }
+    </style>
+</head>
+<body class="flex h-screen w-full relative">
+
+    <div id="mobileOverlay" class="overlay md:hidden"></div>
+
+    <aside id="sidebar" class="sidebar bg-white border-r border-slate-200 h-full flex flex-col z-50 shadow-sm">
+        <div class="h-16 flex items-center px-5 border-b border-slate-100 shrink-0">
+            <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center shrink-0">
+                <i class="fas fa-bolt text-white text-sm"></i>
+            </div>
+            <h1 class="nav-text text-sm font-bold text-slate-800 ml-3 whitespace-nowrap">Faster<span class="text-sky-600">Hub</span></h1>
+        </div>
+
+        <nav class="flex-1 py-6 px-3 space-y-1">
+            <a href="dashboard.html" class="flex items-center px-3 py-3 rounded-lg bg-emerald-500 text-white transition-all">
+                <i class="fas fa-chart-pie w-6 text-center text-lg"></i>
+                <span class="nav-text font-semibold text-xs ml-3">Dashboard</span>
+            </a>
+            <a href="promotions.html" class="flex items-center px-3 py-3 rounded-lg text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                <i class="fas fa-ad w-6 text-center text-lg"></i>
+                <span class="nav-text font-semibold text-xs ml-3">Promotions</span>
+            </a>
+            <a href="settings.html" class="flex items-center px-3 py-3 rounded-lg text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                <i class="fas fa-cogs w-6 text-center text-lg"></i>
+                <span class="nav-text font-semibold text-xs ml-3">Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full min-w-0 bg-slate-50">
+        
+        <header class="h-16 px-4 md:px-6 flex items-center border-b border-slate-200 bg-white z-20">
+            <button id="openMobileMenu" class="md:hidden mr-4 p-2 bg-slate-100 rounded-lg hover:bg-emerald-500 hover:text-white transition-all">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <nav class="flex items-center gap-2 overflow-x-auto whitespace-nowrap hide-scrollbar flex-1">
+                <a href="dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                
+                <div class="relative group py-2">
+                    <button class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                    <div class="absolute top-full left-0 mt-0 w-48 bg-white border border-slate-100 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <a href="add-order.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-t-lg">Add New Order</a>
+                        <a href="add-rider.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white">Add New Rider</a>
+                        <a href="announcement.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-b-lg">Announcement</a>
+                    </div>
+                </div>
+
+                <a href="shops.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Shops</a>
+                
+                <a href="admin-topups.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+                    <span>Top-up</span>
+                    <span id="badgeTopup" class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+                
+                <a href="withdraw-requests.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+                    <span>Payout</span>
+                    <span id="badgePayout" class="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+                
+                <a href="reports.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Reports</a>
+                
+                <a href="financials.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                    <i class="fas fa-chart-line text-xs"></i> Financials
+                </a>
+
+                <a href="settings.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Settings</a>
+            </nav>
+            
+            <div class="text-[10px] font-bold text-emerald-500 uppercase flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live
+            </div>
+        </header>
+
+        <div class="flex-1 p-6 overflow-y-auto">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <a href="order-management.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                    <div class="w-9 h-9 rounded-md bg-sky-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
+                        <i class="fas fa-bolt text-sky-600 group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Active Orders</h3>
+                    <span id="badgeActive" class="absolute top-4 right-4 bg-sky-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+
+                <a href="pending-orders.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                    <div class="w-9 h-9 rounded-md bg-amber-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
+                        <i class="fas fa-clock text-amber-600 group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Pending Orders</h3>
+                    <span id="badgePending" class="absolute top-4 right-4 bg-amber-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+
+                <a href="order-management.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                    <div class="w-9 h-9 rounded-md bg-emerald-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
+                        <i class="fas fa-check-circle text-emerald-600 group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Completed Orders</h3>
+                    <span id="badgeCompleted" class="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+
+                <a href="order-management.html" class="relative bg-white p-4 rounded-lg border-b-2 border-slate-200 shadow-sm hover:bg-emerald-500 group transition-all">
+                    <div class="w-9 h-9 rounded-md bg-rose-100 flex items-center justify-center mb-3 group-hover:bg-white/20 transition-all">
+                        <i class="fas fa-times-circle text-rose-600 group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800 group-hover:text-white">Canceled Orders</h3>
+                    <span id="badgeCanceled" class="absolute top-4 right-4 bg-rose-500 text-white text-xs font-extrabold px-2 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Mobile Sidebar Controls
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        const openBtn = document.getElementById('openMobileMenu');
+        
+        openBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+
+        // ─── SUPABASE INTEGRATION LOGIC ──────────────────────────────────────
+        const SB_URL = "https://hkabhikizdlbavfkualt.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrYWJoaWtpemRsYmF2Zmt1YWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODgyMjUsImV4cCI6MjA5MjA2NDIyNX0.iMlS6-M1aylW8K915LPYDHOg7qUxwu5GelH_CPHLP2U";
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
+        // Fetch Counts and Update UI
+        async function fetchDashboardCounts() {
+            try {
+                // Ek saath tamam queries execute karna speed k liye
+                const [topupsRes, withdrawsRes, activeOrdersRes, pendingOrdersRes, completedOrdersRes, canceledOrdersRes] = await Promise.all([
+                    _supabase.from('topup_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+                    _supabase.from('withdraw_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['assigned', 'processing']),
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
+                    _supabase.from('orders').select('id', { count: 'exact', head: true }).in('status', ['canceled', 'cancelled', 'CANCELLED'])
+                ]);
+
+                // Inner HTML counters update krna
+                document.getElementById('badgeTopup').innerText = topupsRes.count || 0;
+                document.getElementById('badgePayout').innerText = withdrawsRes.count || 0;
+                document.getElementById('badgeActive').innerText = activeOrdersRes.count || 0;
+                document.getElementById('badgePending').innerText = pendingOrdersRes.count || 0;
+                document.getElementById('badgeCompleted').innerText = completedOrdersRes.count || 0;
+                document.getElementById('badgeCanceled').innerText = canceledOrdersRes.count || 0;
+
+            } catch (error) {
+                console.error("Dashboard Sync Error:", error);
+            }
+        }
+
+        // Realtime Channels Sync Setup
+        function setupDashboardLiveSync() {
+            // 1. Listen to Orders Changes
+            _supabase.channel('db-orders-sync')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+                    fetchDashboardCounts();
+                }).subscribe();
+
+            // 2. Listen to Topup Changes
+            _supabase.channel('db-topups-sync')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'topup_requests' }, () => {
+                    fetchDashboardCounts();
+                }).subscribe();
+
+            // 3. Listen to Withdraw Changes
+            _supabase.channel('db-withdraws-sync')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'withdraw_requests' }, () => {
+                    fetchDashboardCounts();
+                }).subscribe();
+        }
+
+        // Initialize Everything on Load
+        window.onload = () => {
+            fetchDashboardCounts();
+            setupDashboardLiveSync();
+        };
+    </script>
+</body>
+</html>
