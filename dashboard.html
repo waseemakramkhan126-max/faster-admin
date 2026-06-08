@@ -472,12 +472,7 @@
             position: relative;
             z-index: 1;
         }
-        .stat-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            z-index: 2;
-        }
+        /* stat-badge removed */
 
         .glass-card {
             background: var(--surface);
@@ -639,13 +634,62 @@
             animation: countUp 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
+        /* ── BUTTONS (TRANSPARENT STYLE) ── */
+        .btn-primary {
+            background: transparent;
+            color: var(--accent);
+            border: 1.5px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 10px 20px;
+            font-size: 12.5px;
+            font-weight: 700;
+            font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            letter-spacing: -0.01em;
+            box-shadow: none;
+        }
+        .btn-primary:hover {
+            background: var(--accent-dim);
+            border-color: var(--accent-hover);
+            color: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(240, 90, 20, 0.15);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted2);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius);
+            padding: 10px 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            letter-spacing: -0.01em;
+        }
+        .btn-ghost:hover {
+            background: var(--surface2);
+            color: var(--text);
+            border-color: var(--muted);
+        }
+
         .quick-action {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 9px;
             padding: 16px 10px;
-            background: var(--surface2);
+            background: transparent;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             text-decoration: none;
@@ -662,7 +706,7 @@
         .quick-action:hover {
             border-color: var(--border2);
             color: var(--text);
-            background: var(--surface);
+            background: var(--surface2);
             transform: translateY(-3px);
             box-shadow: var(--shadow-md);
         }
@@ -675,6 +719,35 @@
             justify-content: center;
             font-size: 13px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .dl-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text2);
+            font-size: 11.5px;
+            font-weight: 600;
+            font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+        }
+        .dl-btn:hover {
+            border-color: var(--accent-border);
+            color: var(--accent);
+            background: var(--accent-dim);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* header nav-btn already transparent */
+        .nav-btn {
+            background: transparent;
         }
 
         .stats-grid {
@@ -790,49 +863,6 @@
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(240, 90, 20, 0.08);
         }
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius);
-            padding: 10px 20px;
-            font-size: 12.5px;
-            font-weight: 700;
-            font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            letter-spacing: -0.01em;
-            box-shadow: 0 2px 8px rgba(240, 90, 20, 0.25);
-        }
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 6px 20px rgba(240, 90, 20, 0.35);
-            transform: translateY(-1px);
-        }
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .btn-ghost {
-            background: transparent;
-            color: var(--muted2);
-            border: 1px solid var(--border2);
-            border-radius: var(--radius);
-            padding: 10px 20px;
-            font-size: 12.5px;
-            font-weight: 600;
-            font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            letter-spacing: -0.01em;
-        }
-        .btn-ghost:hover {
-            background: var(--surface2);
-            color: var(--text);
-            border-color: var(--muted);
-        }
 
         .divider {
             height: 1px;
@@ -840,32 +870,6 @@
             margin: 18px 0;
         }
 
-        /* Download buttons row */
-        .dl-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: var(--radius);
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            color: var(--text2);
-            font-size: 11.5px;
-            font-weight: 600;
-            font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            white-space: nowrap;
-            letter-spacing: -0.01em;
-        }
-        .dl-btn:hover {
-            border-color: var(--accent-border);
-            color: var(--accent);
-            background: var(--accent-dim);
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* ── ADDITIONAL PROFESSIONAL TOUCHES ── */
         .header .nav-btn i {
             font-size: 10px;
         }
@@ -1009,10 +1013,9 @@
                 <div style="font-size:11.5px;color:var(--muted);font-weight:500;" id="currentDate"></div>
             </div>
 
-            <!-- ── STAT CARDS ── -->
+            <!-- ── STAT CARDS (BADGES REMOVED) ── -->
             <div class="stats-grid">
                 <a href="order-management.html" class="stat-card" style="--card-glow:rgba(3,116,168,0.07);">
-                    <div class="stat-badge"><span id="badgeActive" class="badge badge-sky">0</span></div>
                     <div class="stat-icon" style="background:var(--sky-dim);color:var(--sky);"><i class="fas fa-bolt"></i></div>
                     <div class="stat-label">Active</div>
                     <div class="stat-value" style="color:var(--sky);" id="valActive"><div class="skeleton" style="height:30px;width:48px;"></div></div>
@@ -1021,7 +1024,6 @@
                 </a>
 
                 <a href="pending-orders.html" class="stat-card" style="--card-glow:rgba(194,120,3,0.07);">
-                    <div class="stat-badge"><span id="badgePending" class="badge badge-amber">0</span></div>
                     <div class="stat-icon" style="background:var(--amber-dim);color:var(--amber);"><i class="fas fa-clock"></i></div>
                     <div class="stat-label">Pending</div>
                     <div class="stat-value" style="color:var(--amber);" id="valPending"><div class="skeleton" style="height:30px;width:48px;"></div></div>
@@ -1030,7 +1032,6 @@
                 </a>
 
                 <a href="order-management.html" class="stat-card" style="--card-glow:rgba(15,157,74,0.07);">
-                    <div class="stat-badge"><span id="badgeCompleted" class="badge badge-green">0</span></div>
                     <div class="stat-icon" style="background:var(--green-dim);color:var(--green);"><i class="fas fa-check-circle"></i></div>
                     <div class="stat-label">Completed</div>
                     <div class="stat-value" style="color:var(--green);" id="valCompleted"><div class="skeleton" style="height:30px;width:48px;"></div></div>
@@ -1039,7 +1040,6 @@
                 </a>
 
                 <a href="order-management.html" class="stat-card" style="--card-glow:rgba(217,44,44,0.07);">
-                    <div class="stat-badge"><span id="badgeCanceled" class="badge badge-red">0</span></div>
                     <div class="stat-icon" style="background:var(--red-dim);color:var(--red);"><i class="fas fa-times-circle"></i></div>
                     <div class="stat-label">Cancelled</div>
                     <div class="stat-value" style="color:var(--red);" id="valCanceled"><div class="skeleton" style="height:30px;width:48px;"></div></div>
@@ -1048,7 +1048,6 @@
                 </a>
 
                 <a href="admin-topups.html" class="stat-card" style="--card-glow:rgba(240,90,20,0.07);">
-                    <div class="stat-badge"><span id="badgeTopup2" class="badge badge-orange">0</span></div>
                     <div class="stat-icon" style="background:var(--accent-dim);color:var(--accent);"><i class="fas fa-wallet"></i></div>
                     <div class="stat-label">Topup Req.</div>
                     <div class="stat-value" style="color:var(--accent);" id="valTopup"><div class="skeleton" style="height:30px;width:48px;"></div></div>
@@ -1057,7 +1056,6 @@
                 </a>
 
                 <a href="withdraw-requests.html" class="stat-card" style="--card-glow:rgba(108,43,217,0.07);">
-                    <div class="stat-badge"><span id="badgePayout2" class="badge badge-purple">0</span></div>
                     <div class="stat-icon" style="background:var(--purple-dim);color:var(--purple);"><i class="fas fa-money-bill-transfer"></i></div>
                     <div class="stat-label">Payout Req.</div>
                     <div class="stat-value" style="color:var(--purple);" id="valPayout"><div class="skeleton" style="height:30px;width:48px;"></div></div>
@@ -1259,14 +1257,13 @@
             }, 30);
         }
 
-        function setStatCard(valId, badgeId, progId, count, total) {
+        // ─── SET STAT CARD (no badge update) ───
+        function setStatCard(valId, progId, count, total) {
             const valEl = document.getElementById(valId);
-            const badgeEl = document.getElementById(badgeId);
             const progEl = document.getElementById(progId);
             valEl.className = 'stat-value count-animate';
             valEl.innerHTML = '0';
             animateCount(valEl, count);
-            if (badgeEl) badgeEl.textContent = count;
             if (progEl && total > 0) progEl.style.width = Math.round((count / total) * 100) + '%';
         }
 
@@ -1298,15 +1295,16 @@
                 const canceled = canceledOrdersRes.count || 0;
                 const total = active + pending + completed + canceled;
 
+                // Header badges still update
                 document.getElementById('badgeTopup').textContent = topup;
                 document.getElementById('badgePayout').textContent = payout;
 
-                setStatCard('valActive', 'badgeActive', 'progActive', active, total);
-                setStatCard('valPending', 'badgePending', 'progPending', pending, total);
-                setStatCard('valCompleted', 'badgeCompleted', 'progCompleted', completed, total);
-                setStatCard('valCanceled', 'badgeCanceled', 'progCanceled', canceled, total);
-                setStatCard('valTopup', 'badgeTopup2', 'progTopup', topup, topup + payout + 1);
-                setStatCard('valPayout', 'badgePayout2', 'progPayout', payout, topup + payout + 1);
+                setStatCard('valActive', 'progActive', active, total);
+                setStatCard('valPending', 'progPending', pending, total);
+                setStatCard('valCompleted', 'progCompleted', completed, total);
+                setStatCard('valCanceled', 'progCanceled', canceled, total);
+                setStatCard('valTopup', 'progTopup', topup, topup + payout + 1);
+                setStatCard('valPayout', 'progPayout', payout, topup + payout + 1);
 
                 const colorMap = {
                     valActive: 'var(--sky)',
