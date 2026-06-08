@@ -130,7 +130,7 @@
     </div>
 </main>
 
-<!-- MODAL -->
+<!-- MODAL for creating/editing -->
 <div class="modal-backdrop" id="announceModal">
     <div class="modal-box">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -194,7 +194,7 @@
     </div>
 </div>
 
-<!-- DETAIL MODAL (for sent announcements) -->
+<!-- DETAIL MODAL -->
 <div class="modal-backdrop" id="detailModal">
     <div class="modal-box">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -289,27 +289,46 @@
         document.getElementById('badgePayout').textContent = payout || 0;
     }
 
+    // ─── LOAD ANNOUNCEMENTS (using notifications table only) ───
     async function loadAnnouncements() {
-        const { data, error } = await _supabase.from('announcements').select('*').order('created_at', {ascending: false});
         const list = document.getElementById('announcementsList');
-        if (error || !data) { list.innerHTML = '<div style="color:var(--red);padding:20px;">Failed to load announcements. Make sure the <b>announcements</b> table exists.</div>'; return; }
-        if (data.length === 0) { list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);">No announcements yet. Create your first one!</div>'; return; }
-        list.innerHTML = data.map(a => `
-            <div class="glass-card" style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="flex:1;">
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                        <h4 style="font-weight:700;">${escapeHtml(a.title)}</h4>
-                        <span class="badge badge-sky">${a.target_summary || 'custom'}</span>
+        // Get all announcement master records (phone = 'master')
+        const { data: masters, error } = await _supabase
+            .from('notifications')
+            .select('*')
+            .eq('phone', 'master')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            list.innerHTML = `<div style="color:var(--red);padding:20px;">Failed to load announcements: ${error.message}</div>`;
+            return;
+        }
+        if (!masters || masters.length === 0) {
+            list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);">No announcements yet. Create your first one!</div>';
+            return;
+        }
+
+        list.innerHTML = masters.map(m => {
+            // customer_phone field holds the group UUID
+            const groupId = m.customer_phone;
+            const meta = JSON.parse(m.message); // message stores JSON with original message, targets, channels
+            return `
+                <div class="glass-card" style="display:flex;justify-content:space-between;align-items:center;">
+                    <div style="flex:1;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                            <h4 style="font-weight:700;">${escapeHtml(m.title)}</h4>
+                            <span class="badge badge-sky">${meta.target_summary || 'Unknown'}</span>
+                        </div>
+                        <p style="font-size:13px;color:var(--muted2);">${escapeHtml(meta.message || '')}</p>
+                        <div style="font-size:10px;color:var(--muted);margin-top:4px;">${new Date(m.created_at).toLocaleString()}</div>
                     </div>
-                    <p style="font-size:13px;color:var(--muted2);">${escapeHtml(a.message).substring(0,100)}</p>
-                    <div style="font-size:10px;color:var(--muted);margin-top:4px;">${new Date(a.created_at).toLocaleString()}</div>
+                    <div style="display:flex;gap:6px;">
+                        <button class="icon-btn" onclick="viewDetail('${groupId}')"><i class="fas fa-eye"></i></button>
+                        <button class="icon-btn" onclick="deleteAnnouncement('${groupId}')"><i class="fas fa-trash" style="color:var(--red);"></i></button>
+                    </div>
                 </div>
-                <div style="display:flex;gap:6px;">
-                    <button class="icon-btn" onclick="viewDetail('${a.id}')"><i class="fas fa-eye"></i></button>
-                    <button class="icon-btn" onclick="deleteAnnouncement('${a.id}')"><i class="fas fa-trash" style="color:var(--red);"></i></button>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     function escapeHtml(text) { return String(text).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
@@ -331,8 +350,8 @@
 
     async function saveAnnouncement() {
         const title = document.getElementById('annTitle').value.trim();
-        const message = document.getElementById('annMessage').value.trim();
-        if (!title || !message) return showToast('Title and message required', 'warning');
+        const messageText = document.getElementById('annMessage').value.trim();
+        if (!title || !messageText) return showToast('Title and message required', 'warning');
         if (selectedTargets.size === 0) return showToast('Select at least one target audience', 'warning');
         if (selectedChannels.size === 0) return showToast('Select at least one delivery channel', 'warning');
 
@@ -341,89 +360,115 @@
 
         const targetSummary = [...selectedTargets].join(', ');
         const channels = [...selectedChannels];
+        const groupId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
 
-        // Store announcement metadata
-        const { data: ann, error } = await _supabase.from('announcements').insert({
-            title, message, target_summary: targetSummary, channels: channels,
-            specific_phones: specificPhones
-        }).select().single();
+        // 1. Save master record in notifications
+        const masterPayload = {
+            phone: 'master',
+            customer_phone: groupId, // used as group identifier
+            title: title,
+            message: JSON.stringify({
+                message: messageText,
+                target_summary: targetSummary,
+                channels: channels,
+                specific_phones: specificPhones
+            }),
+            is_read: true,
+            created_at: new Date().toISOString()
+        };
 
-        if (error) { showToast('Failed to save announcement', 'error'); console.error(error); return; }
-
-        // Handle in-app notifications
-        if (channels.includes('inApp')) {
-            let phoneNumbers = [];
-            if (selectedTargets.has('allCustomers')) {
-                const { data: customers } = await _supabase.from('customers').select('phone');
-                if (customers) phoneNumbers.push(...customers.map(c=>c.phone));
-            }
-            if (selectedTargets.has('allRiders')) {
-                const { data: riders } = await _supabase.from('riders').select('phone');
-                if (riders) phoneNumbers.push(...riders.map(r=>r.phone));
-            }
-            if (selectedTargets.has('specific')) phoneNumbers.push(...specificPhones);
-            const uniquePhones = [...new Set(phoneNumbers)];
-            if (uniquePhones.length > 0) {
-                const notifications = uniquePhones.map(phone => ({
-                    phone: phone,
-                    title: title,
-                    message: message,
-                    is_read: false
-                }));
-                const { error: notifError } = await _supabase.from('notifications').insert(notifications);
-                if (notifError) showToast('In-app notifications partially failed', 'warning');
-            }
+        const { error: masterError } = await _supabase.from('notifications').insert(masterPayload);
+        if (masterError) {
+            showToast('Failed to save announcement', 'error');
+            console.error(masterError);
+            return;
         }
 
-        // Generate action links for other channels
-        let actionLinks = [];
-        if (channels.includes('whatsapp')) actionLinks.push({ channel: 'WhatsApp', url: generateWhatsAppLinks(message) });
-        if (channels.includes('sms')) actionLinks.push({ channel: 'SMS', url: generateSMSLinks(message) });
-        if (channels.includes('email')) actionLinks.push({ channel: 'Email', url: generateEmailLinks(message) });
+        // 2. Prepare recipient list
+        let phoneNumbers = [];
+        if (selectedTargets.has('allCustomers')) {
+            const { data: customers } = await _supabase.from('customers').select('phone');
+            if (customers) phoneNumbers.push(...customers.map(c=>c.phone));
+        }
+        if (selectedTargets.has('allRiders')) {
+            const { data: riders } = await _supabase.from('riders').select('phone');
+            if (riders) phoneNumbers.push(...riders.map(r=>r.phone));
+        }
+        if (selectedTargets.has('specific')) phoneNumbers.push(...specificPhones);
+        const uniquePhones = [...new Set(phoneNumbers)];
 
-        showToast(`Announcement saved! ${actionLinks.length ? 'Action links generated.' : ''}`, 'success');
+        // 3. Insert individual notifications if in-app channel selected
+        if (channels.includes('inApp') && uniquePhones.length > 0) {
+            const notifications = uniquePhones.map(phone => ({
+                phone: phone,
+                customer_phone: groupId,  // link to the group
+                title: title,
+                message: messageText,
+                is_read: false,
+                created_at: new Date().toISOString()
+            }));
+            const { error: notifError } = await _supabase.from('notifications').insert(notifications);
+            if (notifError) showToast('In-app notifications partially failed', 'warning');
+        }
+
+        // 4. Generate external channel links
+        let actionLinks = [];
+        if (channels.includes('whatsapp')) actionLinks.push(`WhatsApp: https://wa.me/?text=${encodeURIComponent(messageText)}`);
+        if (channels.includes('sms')) actionLinks.push(`SMS: sms:?body=${encodeURIComponent(messageText)}`);
+        if (channels.includes('email')) actionLinks.push(`Email: mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(messageText)}`);
+
+        showToast('Announcement sent!', 'success');
         closeModal();
         loadAnnouncements();
 
-        // Show action links if any
         if (actionLinks.length) {
-            setTimeout(() => {
-                let msg = 'Action Links:\n' + actionLinks.map(l => `${l.channel}: ${l.url}`).join('\n');
-                alert(msg);
-            }, 500);
+            setTimeout(() => alert('External channel links:\n' + actionLinks.join('\n')), 500);
         }
     }
 
-    function generateWhatsAppLinks(text) {
-        return `https://wa.me/?text=${encodeURIComponent(text)}`;
-    }
-    function generateSMSLinks(text) {
-        return `sms:?body=${encodeURIComponent(text)}`;
-    }
-    function generateEmailLinks(text) {
-        return `mailto:?subject=Announcement&body=${encodeURIComponent(text)}`;
-    }
+    async function viewDetail(groupId) {
+        // Fetch master record for this group
+        const { data: master } = await _supabase
+            .from('notifications')
+            .select('*')
+            .eq('customer_phone', groupId)
+            .eq('phone', 'master')
+            .single();
 
-    async function viewDetail(id) {
-        const { data: ann } = await _supabase.from('announcements').select('*').eq('id', id).single();
-        if (!ann) return;
+        if (!master) return;
+        const meta = JSON.parse(master.message);
+        // Count recipients
+        const { count } = await _supabase
+            .from('notifications')
+            .select('*', { count: 'exact', head: true })
+            .eq('customer_phone', groupId)
+            .neq('phone', 'master');
+
         const content = `
-            <p><strong>Title:</strong> ${escapeHtml(ann.title)}</p>
-            <p><strong>Message:</strong> ${escapeHtml(ann.message)}</p>
-            <p><strong>Target:</strong> ${ann.target_summary}</p>
-            <p><strong>Channels:</strong> ${ann.channels?.join(', ')}</p>
-            <p><strong>Sent at:</strong> ${new Date(ann.created_at).toLocaleString()}</p>
-            ${ann.specific_phones?.length ? `<p><strong>Specific Phones:</strong> ${ann.specific_phones.join(', ')}</p>` : ''}
+            <p><strong>Title:</strong> ${escapeHtml(master.title)}</p>
+            <p><strong>Message:</strong> ${escapeHtml(meta.message)}</p>
+            <p><strong>Target:</strong> ${meta.target_summary}</p>
+            <p><strong>Channels:</strong> ${meta.channels.join(', ')}</p>
+            <p><strong>Recipients:</strong> ${count || 0} people</p>
+            <p><strong>Sent at:</strong> ${new Date(master.created_at).toLocaleString()}</p>
+            ${meta.specific_phones?.length ? `<p><strong>Specific Phones:</strong> ${meta.specific_phones.join(', ')}</p>` : ''}
         `;
         document.getElementById('detailContent').innerHTML = content;
         document.getElementById('detailModal').classList.add('open');
     }
 
-    async function deleteAnnouncement(id) {
-        if (!confirm('Delete this announcement?')) return;
-        await _supabase.from('announcements').delete().eq('id', id);
-        loadAnnouncements();
-        showToast('Deleted', 'success');
+    async function deleteAnnouncement(groupId) {
+        if (!confirm('Delete this announcement and all associated notifications?')) return;
+        const { error } = await _supabase
+            .from('notifications')
+            .delete()
+            .eq('customer_phone', groupId);
+        if (error) {
+            showToast('Delete failed: ' + error.message, 'error');
+        } else {
+            showToast('Announcement deleted', 'success');
+            loadAnnouncements();
+        }
     }
 
     function refreshData() {
@@ -442,23 +487,9 @@
     document.getElementById('announceModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
     document.getElementById('detailModal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
 
-    // Initialize
+    // Start
     fetchBadges();
     loadAnnouncements();
-
-    // Provide SQL for announcements table (run this in Supabase SQL Editor)
-    console.log(`
-    -- Run this SQL to create the announcements table:
-    CREATE TABLE IF NOT EXISTS announcements (
-      id bigserial PRIMARY KEY,
-      title text NOT NULL,
-      message text NOT NULL,
-      target_summary text,
-      channels text[] DEFAULT '{}',
-      specific_phones text[] DEFAULT '{}',
-      created_at timestamp with time zone DEFAULT now()
-    );
-    `);
 </script>
 </body>
 </html>
