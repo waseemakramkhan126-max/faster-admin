@@ -15,6 +15,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js">
     </script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -985,6 +986,7 @@
                     </button>
                     <div class="dropdown-menu" style="min-width:220px;">
                         <a class="dd-item" onclick="openOrdersModal()"><i class="fas fa-file-pdf" style="margin-right:8px;color:var(--red);"></i>Orders PDF (by Status/Date)</a>
+                        <a class="dd-item" onclick="openExportModal()"><i class="fas fa-file-export" style="margin-right:8px;color:var(--accent);"></i>Export Any Table</a>
                         <a class="dd-item" onclick="openCustomersModal()"><i class="fas fa-users" style="margin-right:8px;color:var(--blue);"></i>Customer Data PDF</a>
                     </div>
                 </div>
@@ -1124,6 +1126,9 @@
                             <div class="quick-action-icon" style="background:var(--red-dim);color:var(--red);"><i class="fas fa-file-pdf"></i></div>
                             Orders PDF
                         </a>
+                        <a class="quick-action" onclick="openExportModal()">
+                            <div class="quick-action-icon" style="background:var(--accent-dim);color:var(--accent);"><i class="fas fa-file-export"></i></div>Export Data
+                        </a>
                         <a class="quick-action" onclick="openCustomersModal()">
                             <div class="quick-action-icon" style="background:var(--blue-dim);color:var(--blue);"><i class="fas fa-users"></i></div>
                             Customers
@@ -1217,6 +1222,65 @@
             </div>
         </div>
     </div>
+    <div class="modal-backdrop" id="exportModal">
+    <div class="modal-box" style="max-width:700px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div>
+                <div class="modal-title"><i class="fas fa-file-export" style="color:var(--accent);margin-right:10px;font-size:17px;"></i>Export Any Table</div>
+                <div class="modal-sub">Select table, apply filters, and download as PDF or Excel</div>
+            </div>
+            <button class="icon-btn" onclick="closeExportModal()"><i class="fas fa-times" style="font-size:11px;"></i></button>
+        </div>
+        <div class="divider"></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;">
+            <div class="form-group" style="min-width:180px;">
+                <label class="form-label">Table</label>
+                <select id="exportTable" class="form-select" onchange="onExportTableChange()">
+                    <option value="">-- Choose --</option>
+                    <option value="orders">Orders</option>
+                    <option value="riders">Riders</option>
+                    <option value="customers">Customers</option>
+                    <option value="topup_requests">Top‑up Requests</option>
+                    <option value="withdraw_requests">Withdraw Requests</option>
+                    <option value="notifications">Notifications</option>
+                    <option value="delivery_areas">Delivery Areas</option>
+                    <option value="promotions">Promotions</option>
+                    <option value="order_chats">Order Chats</option>
+                    <option value="admin_profile">Admin Profiles</option>
+                    <option value="app_settings">App Settings</option>
+                </select>
+            </div>
+            <div class="form-group" style="min-width:180px;">
+                <label class="form-label">Search</label>
+                <input type="text" id="exportSearch" class="form-input" placeholder="Phone / Name / ID">
+            </div>
+            <div class="form-group" style="min-width:150px;">
+                <label class="form-label">Status</label>
+                <select id="exportStatus" class="form-select"><option value="">All</option></select>
+            </div>
+            <div class="form-group" style="min-width:130px;">
+                <label class="form-label">Date From</label>
+                <input type="date" id="exportDateFrom" class="form-input">
+            </div>
+            <div class="form-group" style="min-width:130px;">
+                <label class="form-label">Date To</label>
+                <input type="date" id="exportDateTo" class="form-input">
+            </div>
+            <div class="form-group" style="display:flex;align-items:end;gap:8px;">
+                <button class="btn-primary" onclick="exportPreview()"><i class="fas fa-search"></i> Preview</button>
+                <button class="btn-primary" onclick="exportDownload('pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
+                <button class="btn-primary" onclick="exportDownload('excel')"><i class="fas fa-file-excel"></i> Excel</button>
+            </div>
+        </div>
+        <div style="overflow-x:auto; max-height:400px; border:1px solid var(--border); border-radius:var(--radius); margin-top:12px;">
+            <table id="exportTablePreview" class="w-full text-sm" style="border-collapse:collapse;width:100%;">
+                <thead class="bg-surface2" id="exportTableHead"></thead>
+                <tbody id="exportTableBody"></tbody>
+            </table>
+        </div>
+        <div id="exportRowCount" style="margin-top:8px;font-size:11px;color:var(--muted);"></div>
+    </div>
+</div>
 
     <script>
         // ─── SUPABASE ───
@@ -1738,7 +1802,134 @@
                 showToast('Download failed: ' + err.message, 'error');
             }
         }
+// ── EXPORT ANY TABLE MODAL CLOSING LOGIC ──
+    ['ordersModal', 'customersModal', 'exportModal'].forEach(id => {
+        const modalEl = document.getElementById(id);
+        if (modalEl) {
+            modalEl.addEventListener('click', function(e) { 
+                if (e.target === this) this.classList.remove('open'); 
+            });
+        }
+    });
 
+    // ── EXPORT ANY TABLE FUNCTIONS ──
+    const exportTableColumns = {
+        orders: ['id','customer_phone','customer_name','delivery_address','order_details','status','rider_status','item_price','dc_amount','bill_amount','balance_amount','final_amount','previous_due','rider_phone','rider_name','rider_id','assigned_at','arrived_at','created_at','updated_at','cancel_reason','area'],
+        riders: ['id','rider_id','phone','name','shift_status','status','area','created_at'],
+        customers: ['phone','name','email','address','wallet_balance','total_pending','total_advance','city','area','created_at'],
+        topup_requests: ['id','customer_phone','amount','status','created_at','updated_at'],
+        withdraw_requests: ['id','customer_phone','bank_name','account_title','account_number','amount','status','created_at','admin_reference','cancel_reason'],
+        notifications: ['id','phone','title','message','is_read','created_at','customer_phone'],
+        delivery_areas: ['id','city','area_name','is_active','customer_delivery_fee','open_hour','close_hour'],
+        promotions: ['id','title','promo_type','promo_text','duration','promo_active','created_at','category','vendor_name','start_date','expiry_date'],
+        order_chats: ['id','order_id','sender_phone','receiver_phone','message','file_url','type','status','created_at'],
+        admin_profile: ['id','name','gmail','role','created_at'],
+        app_settings: ['id','rider_commission','delivery_timer','logo_url','promo_active','promo_type','promo_text','bank_name','bank_account_title','bank_account_number','support_phone','delivery_popup_message']
+    };
+
+    const exportStatusCols = { orders: 'status', topup_requests: 'status', withdraw_requests: 'status', riders: 'status', delivery_areas: 'is_active', promotions: 'promo_active', order_chats: 'status' };
+
+    function openExportModal() { document.getElementById('exportModal').classList.add('open'); }
+    function closeExportModal() { document.getElementById('exportModal').classList.remove('open'); }
+
+    function onExportTableChange() {
+        const table = document.getElementById('exportTable').value;
+        const statusSelect = document.getElementById('exportStatus');
+        statusSelect.innerHTML = '<option value="">All</option>';
+        if (!table || !exportStatusCols[table]) return;
+        const col = exportStatusCols[table];
+        if (col === 'is_active' || col === 'promo_active') {
+            statusSelect.innerHTML += '<option value="true">Active</option><option value="false">Inactive</option>';
+            return;
+        }
+        _supabase.from(table).select(col).then(({ data }) => {
+            if (data) {
+                [...new Set(data.map(d => d[col]).filter(Boolean))].forEach(v => {
+                    statusSelect.innerHTML += `<option value="${v}">${v}</option>`;
+                });
+            }
+        });
+    }
+
+    async function buildExportQuery() {
+        const table = document.getElementById('exportTable').value;
+        const search = document.getElementById('exportSearch').value.trim();
+        const statusVal = document.getElementById('exportStatus').value;
+        const dateFrom = document.getElementById('exportDateFrom').value;
+        const dateTo = document.getElementById('exportDateTo').value;
+        const columns = exportTableColumns[table] || [];
+
+        let query = _supabase.from(table).select('*');
+        if (search && columns.length) {
+            if (table === 'orders') query = query.or(`customer_phone.ilike.%${search}%,customer_name.ilike.%${search}%,id.eq.${isNaN(search)?-1:search}`);
+            else if (table === 'riders') query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%,rider_id.ilike.%${search}%`);
+            else if (table === 'customers') query = query.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
+            else query = query.ilike(columns[0], `%${search}%`);
+        }
+        if (statusVal && exportStatusCols[table]) {
+            const col = exportStatusCols[table];
+            query = query.eq(col, statusVal === 'true' ? true : statusVal === 'false' ? false : statusVal);
+        }
+        if (dateFrom) query = query.gte('created_at', dateFrom + 'T00:00:00');
+        if (dateTo) query = query.lte('created_at', dateTo + 'T23:59:59');
+        query = query.order('created_at', { ascending: false }).limit(5000);
+        return await query;
+    }
+
+    async function exportPreview() {
+        const table = document.getElementById('exportTable').value;
+        if (!table) return showToast('Select a table', 'warning');
+        const columns = exportTableColumns[table] || [];
+        const { data } = await buildExportQuery();
+        if (!data) return;
+        const thead = document.getElementById('exportTableHead');
+        const tbody = document.getElementById('exportTableBody');
+        if (!data.length) {
+            thead.innerHTML = ''; tbody.innerHTML = '<tr><td style="padding:20px;color:var(--muted);text-align:center;">No data found</td></tr>';
+            document.getElementById('exportRowCount').textContent = '';
+            return;
+        }
+        thead.innerHTML = '<tr>' + columns.map(c => `<th style="padding:8px 12px;text-align:left;font-weight:600;border-bottom:1px solid var(--border);">${c}</th>`).join('') + '</tr>';
+        tbody.innerHTML = data.map(row => '<tr>' + columns.map(c => {
+            let val = row[c];
+            if (val === null || val === undefined) val = '';
+            else if (typeof val === 'boolean') val = val ? '✅' : '❌';
+            else if (c.includes('at') && val) val = new Date(val).toLocaleString();
+            return `<td style="padding:8px 12px;border-bottom:1px solid var(--border);">${val}</td>`;
+        }).join('') + '</tr>').join('');
+        document.getElementById('exportRowCount').textContent = `${data.length} rows`;
+    }
+
+    async function exportDownload(format) {
+        const table = document.getElementById('exportTable').value;
+        if (!table) return showToast('Select a table', 'warning');
+        const columns = exportTableColumns[table] || [];
+        const { data } = await buildExportQuery();
+        if (!data || !data.length) return showToast('No data to export', 'warning');
+
+        if (format === 'pdf') {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const head = [columns];
+            const body = data.map(row => columns.map(c => {
+                let val = row[c];
+                if (val === null || val === undefined) return '';
+                if (typeof val === 'boolean') return val ? 'Yes' : 'No';
+                if (c.includes('at') && val) return new Date(val).toLocaleString();
+                return String(val);
+            }));
+            doc.setFontSize(12); doc.text(`FasterHub - ${table}`, 14, 12);
+            doc.autoTable({ head, body, startY: 18, styles: { fontSize: 7, cellPadding: 1.5 }, margin: { left: 5, right: 5 } });
+            doc.save(`${table}_${new Date().toISOString().slice(0,10)}.pdf`);
+        } else {
+            const sheetData = data.map(row => columns.map(c => row[c]));
+            sheetData.unshift(columns);
+            const ws = XLSX.utils.aoa_to_sheet(sheetData);
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, table);
+            XLSX.writeFile(wb, `${table}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+        showToast(`${format.toUpperCase()} downloaded`, 'success');
+    }
         // ─── INIT ───
         window.onload = () => {
             setDate();
