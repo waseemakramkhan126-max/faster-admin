@@ -7,24 +7,113 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="pending-orders-style.css">
+     <link rel="stylesheet" href="pending-orders-style.css">
 </head>
-<body>
+<body class="min-h-screen flex flex-col p-4 sm:p-6">
 
-<header class="bg-white border-b border-slate-200 py-4 px-6 flex justify-between items-center">
-    <div class="font-black text-slate-800 text-lg">🚀 Faster<span class="text-orange-500">Hub</span></div>
-    
-    <nav class="flex gap-2">
-        <a href="dashboard.html" class="nav-btn"><i class="fas fa-home"></i> Dashboard</a>
-        <button class="nav-btn" onclick="location.href='add-order.html'">+ Add Order</button>
-        <button class="nav-btn" onclick="openExportModal()">📥 Download</button>
-        <button class="nav-btn" onclick="loadPendingOrders()">🔄 Refresh</button>
-    </nav>
-</header>
+    <header class="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-center border-b border-slate-200 pb-5 mb-6 gap-4">
+        <div class="flex items-center gap-1 w-full lg:w-auto shrink-0">
+            <button onclick="location.href='order-management.html'" class="w-10 h-10 rounded-xl bg-transparent border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center transition-all shadow-sm active:scale-95">
+                <i class="fas fa-chevron-left text-sm"></i>
+            </button>
+            <div class="flex items-center gap-1">
+                <div class="w-10 h-10 rounded-xl bg-transparent border border-transparent flex items-center justify-center text-orange-600">
+                    <i class="fas fa-clock text-lg animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-black text-slate-500 tracking-tight">Pending Orders</h1>
+                    <p class="text-[11px] text-slate-500 font-medium">Live control for order queues</p>
+                </div>
+            </div>
+        </div>
 
-<main class="p-6">
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto justify-between flex-1 lg:pl-6">
+            <nav class="flex items-center gap-2 overflow-x-auto whitespace-nowrap hide-scrollbar flex-1 w-full sm:w-auto text-xs font-bold">
+                <a href="dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                
+                <div class="relative group py-2">
+                    <button class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                    <div class="absolute top-full left-0 mt-0 w-48 bg-white border border-slate-100 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <a href="add-order.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-t-lg">Add New Order</a>
+                        <a href="add-rider.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white">Add New Rider</a>
+                        <a href="announcement.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-b-lg">Announcement</a>
+                    </div>
+                </div>
+
+                <a href="shops.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Shops</a>
+                
+                <a href="admin-topups.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+                    <span>Top-up</span>
+                    <span id="badgeTopup" class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+                
+                <a href="withdraw-requests.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+                    <span>Payout</span>
+                    <span id="badgePayout" class="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+                </a>
+                
+                <a href="reports.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Reports</a>
+                
+                <a href="financials.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+                    <i class="fas fa-chart-line text-xs"></i> Financials
+                </a>
+
+                <a href="settings.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Settings</a>
+            </nav>
+            
+            <div class="text-[10px] font-bold text-emerald-500 uppercase flex items-center gap-1 bg-emerald-50 px-2.5 py-1.5 rounded-md border border-emerald-200 shrink-0 self-end sm:self-auto">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto w-full flex-1">
+        <div id="mainLoader" class="flex flex-col items-center justify-center py-24 opacity-60">
+            <i class="fas fa-circle-notch animate-spin text-3xl text-orange-500 mb-3"></i>
+            <p class="text-xs font-bold uppercase tracking-widest text-slate-600">Syncing Pending Matrix...</p>
+        </div>
+
+        <div id="ordersList" class="hidden flex flex-col gap-3 w-full">
+            </div>
+
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center premium-card rounded-3xl p-8">
+            <div class="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mb-4 text-xl">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <h3 class="text-slate-800 font-bold text-sm uppercase tracking-wider">No Pending Orders</h3>
+            <p class="text-xs text-slate-500 max-w-xs mt-1">Sabhi orders processed ho chuke hain. Naye orders ka intezar karein.</p>
+        </div>
     </main>
 
-<script src="pending-orders-logic.js"></script>
+    <div id="riderModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white border border-slate-200 rounded-[2rem] p-6 shadow-2xl flex flex-col max-h-[85vh]">
+            
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
+                <div>
+                    <h3 class="text-slate-800 font-black text-sm uppercase tracking-wider">Select Available Rider</h3>
+                    <p class="text-[10px] text-slate-500 font-bold mt-0.5">Order dispatch karne k liye rider assign karein</p>
+                </div>
+                <button onclick="closeRiderModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <div class="relative mb-4">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="riderSearch" oninput="filterRidersList()" placeholder="Search by Rider ID, Name or Phone..." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-slate-400 text-slate-700 placeholder-slate-400 transition-all">
+            </div>
+            
+            <div id="ridersContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-1 min-h-[250px]">
+                </div>
+        </div>
+    </div>
+
+    <script src="pending-orders-logic.js"></script>
 </body>
 </html>
