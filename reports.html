@@ -3,39 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DeliveryHub — Live Reports</title>
+  <title>FasterHub — Live Reports</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* ── LIGHT THEME VARIABLES ── */
     :root {
-      --bg: #0b0f1a; --surface: #111827; --surface2: #1a2235; --surface3: #1f2d45;
-      --border: rgba(255,255,255,0.06); --border2: rgba(255,255,255,0.10);
-      --accent: #ff6b35; --accent2: #ff8c5a; --accent-glow: rgba(255,107,53,0.18);
-      --green: #22c55e; --green-soft: rgba(34,197,94,0.12);
-      --red: #ef4444; --red-soft: rgba(239,68,68,0.12);
-      --yellow: #f59e0b; --yellow-soft: rgba(245,158,11,0.12);
-      --blue: #3b82f6; --blue-soft: rgba(59,130,246,0.12);
-      --purple: #a855f7;
-      --text: #f1f5f9; --text2: #94a3b8; --text3: #64748b;
+      --bg: #ffffff;             /* Page Background White */
+      --surface: #ffffff;        /* Card Background White */
+      --surface2: #f8f9fd;       /* Light Grey for Hover/Secondary */
+      --surface3: #f0f2f9;
+      --border: rgba(0, 0, 0, 0.08);
+      --border2: rgba(0, 0, 0, 0.15);
+      
+      --accent: #f05a14; --accent2: #d94a0a; --accent-glow: rgba(240,90,20,0.08);
+      --green: #0f9d4a; --green-soft: rgba(15,157,74,0.12);
+      --red: #d92c2c; --red-soft: rgba(217,44,44,0.12);
+      --yellow: #c27803; --yellow-soft: rgba(194,120,3,0.12);
+      --blue: #1a56db; --blue-soft: rgba(26,86,219,0.12);
+      --purple: #6c2bd9;
+      
+      --text: #0b1018;           /* Dark Text */
+      --text2: #2a3045;          /* Medium Text */
+      --text3: #5a6178;          /* Light Text */
+      
       --sidebar-w: 260px; --radius: 14px;
       --font-display: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
     }
+    
     html { font-size: 15px; }
     body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; display: flex; overflow-x: hidden; }
 
     /* SIDEBAR */
     .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100; padding: 0 0 24px; }
     .sidebar-logo { padding: 24px 22px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 11px; }
-    .logo-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .logo-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white;}
     .logo-text { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em; }
     .logo-text span { color: var(--accent); }
     .sidebar-section { padding: 20px 12px 6px; }
     .sidebar-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); padding: 0 10px; margin-bottom: 6px; }
     .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 9px; cursor: pointer; color: var(--text2); font-size: 0.88rem; font-weight: 500; transition: all 0.18s; text-decoration: none; }
     .nav-item:hover { background: var(--surface2); color: var(--text); }
-    .nav-item.active { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(255,107,53,0.2); }
+    .nav-item.active { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(240,90,20,0.2); }
     .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
     .sidebar-bottom { margin-top: auto; padding: 16px 12px 0; border-top: 1px solid var(--border); }
     .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; background: var(--surface2); }
@@ -49,12 +61,13 @@
     .topbar-title { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; }
     .topbar-breadcrumb { font-size: 0.78rem; color: var(--text3); margin-top: 2px; }
     .topbar-breadcrumb span { color: var(--accent); font-weight: 500; }
-    .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 9px; font-size: 0.83rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.18s; font-family: var(--font-body); }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent2); }
-    .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border2); }
-    .btn-ghost:hover { background: var(--surface3); color: var(--text); }
+    .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    
+    /* ── TRANSPARENT BUTTONS ── */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 9px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); transition: all 0.18s; font-family: var(--font-body); background: transparent; color: var(--text2); text-decoration: none;}
+    .btn:hover { border-color: var(--text); color: var(--text); }
+    .btn-primary { border-color: var(--accent); color: var(--accent); }
+    .btn-primary:hover { border-color: var(--accent2); color: var(--accent2); background: var(--accent-glow); }
 
     /* LOADING */
     .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; transition: opacity 0.4s; }
@@ -66,19 +79,20 @@
     /* CONTENT */
     .content { padding: 28px; flex: 1; }
 
-    /* FILTER */
+    /* FILTER (Transparent Tabs) */
     .filter-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 26px; flex-wrap: wrap; }
-    .filter-tab { padding: 7px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: var(--surface); color: var(--text2); transition: all 0.15s; font-family: var(--font-body); }
-    .filter-tab:hover { color: var(--text); background: var(--surface2); }
-    .filter-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .filter-tab { padding: 7px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: transparent; color: var(--text2); transition: all 0.15s; font-family: var(--font-body); }
+    .filter-tab:hover { color: var(--text); border-color: var(--text); }
+    .filter-tab.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+    
     .live-badge { display: flex; align-items: center; gap: 6px; margin-left: auto; font-size: 0.78rem; color: var(--green); background: var(--green-soft); padding: 5px 12px; border-radius: 7px; font-weight: 600; }
     .live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
     /* KPI */
     .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
-    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; position: relative; overflow: hidden; transition: transform 0.2s, border-color 0.2s; animation: fadeUp 0.5s both; }
-    .kpi-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; position: relative; overflow: hidden; transition: transform 0.2s, border-color 0.2s; animation: fadeUp 0.5s both; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+    .kpi-card:hover { transform: translateY(-2px); border-color: var(--border2); box-shadow: 0 6px 15px rgba(0,0,0,0.05); }
     .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius: var(--radius) var(--radius) 0 0; }
     .kpi-card.green::before { background: var(--green); }
     .kpi-card.orange::before { background: var(--accent); }
@@ -90,26 +104,22 @@
     .kpi-icon.orange { background: var(--accent-glow); }
     .kpi-icon.blue { background: var(--blue-soft); }
     .kpi-icon.purple { background: rgba(168,85,247,0.12); }
-    .kpi-value { font-family: var(--font-display); font-size: 1.95rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+    .kpi-value { font-family: var(--font-display); font-size: 1.95rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; color: var(--text); }
     .kpi-label { font-size: 0.8rem; color: var(--text3); font-weight: 500; }
     .kpi-sub { font-size: 0.75rem; color: var(--text3); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
     .kpi-sub b { color: var(--text2); }
-    .skeleton { background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
-    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    .skel-val { height: 36px; width: 80%; margin-bottom: 8px; }
-    .skel-lbl { height: 14px; width: 60%; }
 
     /* CHARTS */
     .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
     .charts-row2 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
     .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; animation: fadeUp 0.5s both; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; animation: fadeUp 0.5s both; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
     .card-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .card-title { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .card-title { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; letter-spacing: -0.01em; color: var(--text); }
     .card-subtitle { font-size: 0.75rem; color: var(--text3); margin-top: 2px; }
     .card-body { padding: 20px 22px; }
 
-    /* BAR CHART */
+    /* Baki sara CSS same as before, sirf dark mode ke colors replace ho gaye hain... */
     .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding-bottom: 24px; position: relative; }
     .bar-chart::before { content:''; position:absolute; bottom:24px; left:0; right:0; height:1px; background:var(--border); }
     .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
@@ -127,13 +137,13 @@
     .donut-wrap { display: flex; flex-direction: column; align-items: center; }
     .donut-svg-wrap { position: relative; width: 150px; height: 150px; margin: 6px auto 14px; }
     .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
-    .donut-center-val { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
+    .donut-center-val { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text); }
     .donut-center-lbl { font-size: 0.65rem; color: var(--text3); font-weight: 500; }
     .donut-stats { width: 100%; display: flex; flex-direction: column; gap: 8px; }
     .donut-stat { display: flex; align-items: center; justify-content: space-between; }
     .donut-stat-left { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text2); }
     .donut-stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .donut-stat-val { font-size: 0.82rem; font-weight: 600; }
+    .donut-stat-val { font-size: 0.82rem; font-weight: 600; color: var(--text); }
     .donut-stat-pct { font-size: 0.72rem; color: var(--text3); }
 
     /* SPARKLINES */
@@ -151,8 +161,8 @@
     .rider-rank { width: 22px; font-size: 0.75rem; font-weight: 700; color: var(--text3); flex-shrink: 0; }
     .rider-rank.top { color: var(--accent); }
     .rider-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: #fff; flex-shrink: 0; }
-    .rider-name { flex: 1; font-size: 0.82rem; font-weight: 500; }
-    .rider-deliveries { font-size: 0.8rem; font-weight: 700; }
+    .rider-name { flex: 1; font-size: 0.82rem; font-weight: 500; color: var(--text); }
+    .rider-deliveries { font-size: 0.8rem; font-weight: 700; color: var(--text); }
     .rider-rate { font-size: 0.72rem; color: var(--green); background: var(--green-soft); padding: 2px 7px; border-radius: 5px; font-weight: 600; }
 
     /* TABLE */
@@ -160,7 +170,7 @@
     table { width: 100%; border-collapse: collapse; }
     thead th { text-align: left; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
     tbody tr { transition: background 0.15s; }
-    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    tbody tr:hover { background: rgba(0,0,0,0.02); }
     tbody td { padding: 12px 14px; font-size: 0.83rem; border-bottom: 1px solid var(--border); color: var(--text2); }
     tbody tr:last-child td { border-bottom: none; }
     td.text-main { color: var(--text); font-weight: 500; }
@@ -199,7 +209,7 @@
     .kpi-card:nth-child(1){animation-delay:0.05s} .kpi-card:nth-child(2){animation-delay:0.10s}
     .kpi-card:nth-child(3){animation-delay:0.15s} .kpi-card:nth-child(4){animation-delay:0.20s}
 
-    ::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-track{background:var(--surface)} ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px}
+    ::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-track{background:var(--surface)} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
     @media(max-width:1200px){ .kpi-grid{grid-template-columns:repeat(2,1fr)} .charts-row{grid-template-columns:1fr} }
     @media(max-width:900px){ :root{--sidebar-w:0px} .sidebar{display:none} .main{margin-left:0} .content{padding:18px} .charts-row2,.bottom-row{grid-template-columns:1fr} }
@@ -213,19 +223,18 @@
   <div class="loading-text">Loading live data...</div>
 </div>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon">🚀</div>
-    <div><div class="logo-text">Delivery<span>Hub</span></div></div>
+    <div><div class="logo-text">Faster<span>Hub</span></div></div>
   </div>
   <div class="sidebar-section">
     <div class="sidebar-label">Main</div>
-    <a href="#" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
     <a href="#" class="nav-item"><span class="nav-icon">📦</span> Orders</a>
     <a href="#" class="nav-item"><span class="nav-icon">🏍️</span> Riders</a>
     <a href="#" class="nav-item"><span class="nav-icon">📍</span> Live Tracking</a>
-    <a href="#" class="nav-item active"><span class="nav-icon">📊</span> Reports</a>
+    <a href="reports.html" class="nav-item active"><span class="nav-icon">📊</span> Reports</a>
     <a href="#" class="nav-item"><span class="nav-icon">🗺️</span> Zones</a>
   </div>
   <div class="sidebar-section">
@@ -242,22 +251,26 @@
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
   <header class="topbar">
     <div>
       <div class="topbar-title">Reports & Analytics</div>
       <div class="topbar-breadcrumb">Home › <span>Reports</span></div>
     </div>
+    
     <div class="topbar-actions">
-      <button class="btn btn-ghost" onclick="loadAllData()">🔄 Refresh</button>
+      <button class="btn" onclick="window.location.href='add-order.html'">➕ Add</button>
+      <button class="btn" onclick="window.location.href='admin-topups.html'">💳 Top-up</button>
+      <button class="btn" onclick="window.location.href='withdraw-requests.html'">💸 Payout</button>
+      <button class="btn" onclick="openExportModal()">📥 Download</button>
+      <div style="width: 1px; height: 20px; background: var(--border2); margin: 0 4px;"></div>
+      <button class="btn" onclick="loadAllData()">🔄 Refresh</button>
       <button class="btn btn-primary" onclick="exportCSV()">⬇️ Export CSV</button>
     </div>
   </header>
 
   <div class="content">
 
-    <!-- FILTER -->
     <div class="filter-bar">
       <button class="filter-tab" onclick="setFilter('today',this)">Today</button>
       <button class="filter-tab active" onclick="setFilter('week',this)">This Week</button>
@@ -266,7 +279,6 @@
       <div class="live-badge"><div class="live-dot"></div> Live Data</div>
     </div>
 
-    <!-- KPI CARDS -->
     <div class="kpi-grid">
       <div class="kpi-card orange">
         <div class="kpi-header"><div class="kpi-icon orange">📦</div></div>
@@ -294,7 +306,6 @@
       </div>
     </div>
 
-    <!-- CHARTS ROW 1 -->
     <div class="charts-row">
       <div class="card">
         <div class="card-header">
@@ -328,7 +339,6 @@
       </div>
     </div>
 
-    <!-- CHARTS ROW 2 -->
     <div class="charts-row2">
       <div class="card">
         <div class="card-header">
@@ -358,7 +368,6 @@
       </div>
     </div>
 
-    <!-- ORDERS TABLE -->
     <div class="card" style="margin-bottom:24px;">
       <div class="card-header">
         <div><div class="card-title">Orders by Status & Area</div><div class="card-subtitle">Detailed breakdown</div></div>
@@ -381,7 +390,6 @@
       </div>
     </div>
 
-    <!-- BOTTOM ROW -->
     <div class="bottom-row">
 
       <div class="card">
@@ -711,7 +719,7 @@ function exportCSV() {
   const keys = ['id','customer_name','customer_phone','area','status','bill_amount','is_settled','rider_name','created_at'];
   const csv = [keys.join(','), ...allOrders.map(o => keys.map(k => `"${o[k]??''}"`).join(','))].join('\n');
   const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = `deliveryhub_report_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  a.download = `fasterhub_report_${new Date().toISOString().slice(0,10)}.csv`; a.click();
 }
 
 // Filter tab click
