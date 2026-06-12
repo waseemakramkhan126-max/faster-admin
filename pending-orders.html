@@ -28,42 +28,44 @@
         </div>
 
         <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto justify-between flex-1 lg:pl-6">
-            <nav class="flex items-center gap-2 overflow-x-auto whitespace-nowrap hide-scrollbar flex-1 w-full sm:w-auto text-xs font-bold">
-                <a href="dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
-                    <i class="fas fa-home"></i> Home
-                </a>
-                
-                <div class="relative group py-2">
-                    <button class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
-                        <i class="fas fa-plus"></i> Add
-                    </button>
-                    <div class="absolute top-full left-0 mt-0 w-48 bg-white border border-slate-100 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <a href="add-order.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-t-lg">Add New Order</a>
-                        <a href="add-rider.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white">Add New Rider</a>
-                        <a href="announcement.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-b-lg">Announcement</a>
-                    </div>
-                </div>
+            <!-- Yahan se overflow-x-auto aur whitespace-nowrap hata diya gaya hai aur flex-wrap laga diya hai -->
+<nav class="flex items-center gap-2 flex-wrap flex-1 w-full sm:w-auto text-xs font-bold relative z-40">
+    <a href="dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+        <i class="fas fa-home"></i> Home
+    </a>
+    
+    <div class="relative group py-2">
+        <button class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+            <i class="fas fa-plus"></i> Add
+        </button>
+        <!-- Dropdown menu mein z-[999] add kiya gaya hai taake ye sabse upar show ho -->
+        <div class="absolute top-full left-0 mt-0 w-48 bg-white border border-slate-100 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[999]">
+            <a href="add-order.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-t-lg">Add New Order</a>
+            <a href="add-rider.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white">Add New Rider</a>
+            <a href="announcement.html" class="block px-4 py-3 text-xs font-bold text-slate-700 hover:bg-emerald-500 hover:text-white rounded-b-lg">Announcement</a>
+        </div>
+    </div>
 
-                <a href="shops.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Shops</a>
-                
-                <a href="admin-topups.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
-                    <span>Top-up</span>
-                    <span id="badgeTopup" class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
-                </a>
-                
-                <a href="withdraw-requests.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
-                    <span>Payout</span>
-                    <span id="badgePayout" class="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
-                </a>
-                
-                <a href="reports.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Reports</a>
-                
-                <a href="financials.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
-                    <i class="fas fa-chart-line text-xs"></i> Financials
-                </a>
+    <a href="shops.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Shops</a>
+    
+    <a href="admin-topups.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+        <span>Top-up</span>
+        <span id="badgeTopup" class="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+    </a>
+    
+    <a href="withdraw-requests.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all group">
+        <span>Payout</span>
+        <span id="badgePayout" class="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full group-hover:bg-white group-hover:text-emerald-600 transition-all">0</span>
+    </a>
+    
+    <a href="reports.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Reports</a>
+    
+    <a href="financials.html" class="flex items-center gap-2 px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">
+        <i class="fas fa-chart-line text-xs"></i> Financials
+    </a>
 
-                <a href="settings.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Settings</a>
-            </nav>
+    <a href="settings.html" class="px-3 py-2 rounded-md text-slate-600 hover:bg-emerald-500 hover:text-white transition-all">Settings</a>
+</nav>
             
             <div class="text-[10px] font-bold text-emerald-500 uppercase flex items-center gap-1 bg-emerald-50 px-2.5 py-1.5 rounded-md border border-emerald-200 shrink-0 self-end sm:self-auto">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live
